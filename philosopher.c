@@ -30,7 +30,8 @@ int main(void)
     {
         pthread_create(&thread_t[n - 2], NULL, grab_the_fork, (void *)&n);
         pthread_join(thread_t[n - 2], (void **)&status);
-        printf("return thread %d\n", n ++);
+        //printf("return thread %d\n", n ++);
+        n ++;
     }
 }
 //포크를 집는 시간: 31 25 31 25
