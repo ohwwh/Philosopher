@@ -3,6 +3,9 @@
 #include <stdio.h>
 #include <pthread.h>
 
+int number_of_fork = 6;
+int start;
+
 void    *grab_the_fork(void *data)
 {
     int i;
@@ -10,7 +13,8 @@ void    *grab_the_fork(void *data)
 
     struct timeval mytime;
     gettimeofday(&mytime, NULL);
-    printf("at %d %dth philosopher grab the fork!\n", mytime.tv_usec,  *(int *)data);
+    number_of_fork --;
+    printf("at %d %dth philosopher grab the fork! fork is %d\n", mytime.tv_usec - start,  *(int *)data, number_of_fork);
 
   
     return ((void *)i);
@@ -25,11 +29,13 @@ int main(void)
 
     struct timeval mytime;
     gettimeofday(&mytime, NULL);
-    printf("at %d %dth philosopher grab the fork!\n",mytime.tv_usec, n ++);
+    start = mytime.tv_usec;
+    gettimeofday(&mytime, NULL);
+    printf("at %d %dth philosopher grab the fork!\n",mytime.tv_usec - start, n ++);
     while (n < 7)
     {
-        pthread_create(&thread_t[n - 2], NULL, grab_the_fork, (void *)&n);
-        pthread_join(thread_t[n - 2], (void **)&status);
+        pthread_create(&thread_t[n - 2], NULL, &grab_the_fork, (void *)&n);
+        pthread_detach(thread_t[n - 2]);
         //printf("return thread %d\n", n ++);
         n ++;
     }
