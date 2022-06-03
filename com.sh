@@ -1,0 +1,1 @@
+gcc -lpthread philosopher.c -o philosopher
