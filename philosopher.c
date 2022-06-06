@@ -4,27 +4,59 @@
 #include <pthread.h>
 #include <stdint.h>
 
-int afork[5] = {2, 2, 2, 2, 2};
+int afork[5] = {1, 1, 1, 1, 1};
+int state[5] = {0, 0, 0, 0, 0};
 int start;
 pthread_mutex_t mutex_s;
 pthread_mutex_t mutex_n;
 
-void    *grab_the_fork(void *data)
+void    pick(int n)
 {
-    uintptr_t n = (int)data;
-
+    
     struct timeval mytime;
     pthread_mutex_lock(&mutex_s);
-    gettimeofday(&mytime, NULL);
-    afork[(n - 1 + 5) % 5] --;
+    if (afork[(n - 1 + 5) % 5])
+    {
+        afork[(n - 1 + 5) % 5] --;
+        state[n - 1] ++;
+        gettimeofday(&mytime, NULL);
+        printf("at %d %dth philosopher grab the right fork! [%d], [%d], [%d], [%d], [%d]\n", mytime.tv_usec - start, n, afork[0], afork[1], afork[2], afork[3], afork[4]);
+    }
     pthread_mutex_unlock(&mutex_s);
-    printf("at %d %luth philosopher grab the left fork! [%d], [%d], [%d], [%d], [%d]\n", mytime.tv_usec - start,  n, afork[0], afork[1], afork[2], afork[3], afork[4]);
     pthread_mutex_lock(&mutex_s);
-    gettimeofday(&mytime, NULL);
-    afork[(n - 2 + 5) % 5] --;
+    if (afork[(n - 2 + 5) % 5])
+    {
+        afork[(n - 2 + 5) % 5] --;
+        state[n - 1] ++;
+        gettimeofday(&mytime, NULL);
+        printf("at %d %dth philosopher grab the left fork! [%d], [%d], [%d], [%d], [%d]\n", mytime.tv_usec - start, n, afork[0], afork[1], afork[2], afork[3], afork[4]);
+    }
     pthread_mutex_unlock(&mutex_s);
-    printf("at %d %luth philosopher grab the right fork! [%d], [%d], [%d], [%d], [%d]\n", mytime.tv_usec - start,  n, afork[0], afork[1], afork[2], afork[3], afork[4]);
+}
 
+void    *philo(void *data)
+{
+    uintptr_t n = (int)data;
+    int       flag = 0;
+    struct timeval mytime;
+
+    while (1)
+    {
+        pick(n);
+        pthread_mutex_lock(&mutex_s);
+        if (state[n - 1] == 2)
+        {
+            usleep(100);
+            afork[(n - 1 + 5) % 5] ++;
+            afork[(n - 2 + 5) % 5] ++;
+            state[n - 1] = 0;
+            gettimeofday(&mytime, NULL);
+            printf("at %d %luth philosopher finish eating! [%d], [%d], [%d], [%d], [%d]\n", mytime.tv_usec - start, n, afork[0], afork[1], afork[2], afork[3], afork[4]);
+            pthread_mutex_unlock(&mutex_s);
+            return ((void *)n);
+        }
+        pthread_mutex_unlock(&mutex_s);
+    }
     return ((void *)n);
 }
 
@@ -44,7 +76,7 @@ int main(void)
     gettimeofday(&mytime, NULL);
     while (n < 6)
     {
-        pthread_create(&thread_t[n - 1], NULL, grab_the_fork, (void *)(uintptr_t)n);
+        pthread_create(&thread_t[n - 1], NULL, philo, (void *)(uintptr_t)n);
         n ++;
     }
     while (j < 6)
