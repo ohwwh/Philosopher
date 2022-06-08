@@ -1,112 +1,205 @@
-#include <sys/time.h>
-#include <unistd.h>
-#include <stdio.h>
-#include <pthread.h>
-#include <stdint.h>
+#include "philosopher.h"
 
-int fork_num[5] = {1, 1, 1, 1, 1};
-int fork_own[5] = {0, 0, 0, 0, 0};
-int state[5] = {0, 0, 0, 0, 0};
-int start;
-pthread_mutex_t mutex_s;
-pthread_mutex_t mutex_n;
-
-void    picking(int n)
+void    ft_sleep(int time)
 {
-    
     struct timeval mytime;
-    pthread_mutex_lock(&mutex_s);
-    if (fork_num[(n - 1 + 5) % 5])
-    {
-        fork_num[(n - 1 + 5) % 5] --;
-        fork_own[n - 1] ++;
-        gettimeofday(&mytime, NULL);
-        //printf("at %d %dth philosopher grab the right fork! [%d], [%d], [%d], [%d], [%d]\n", mytime.tv_usec - start, n, fork_num[0], fork_num[1], fork_num[2], fork_num[3], fork_num[4]);
-    }
-    pthread_mutex_unlock(&mutex_s);
-    pthread_mutex_lock(&mutex_s);
-    if (fork_num[(n - 2 + 5) % 5])
-    {
-        fork_num[(n - 2 + 5) % 5] --;
-        fork_own[n - 1] ++;
-        gettimeofday(&mytime, NULL);
-        //printf("at %d %dth philosopher grab the left fork! [%d], [%d], [%d], [%d], [%d]\n", mytime.tv_usec - start, n, fork_num[0], fork_num[1], fork_num[2], fork_num[3], fork_num[4]);
-    }
-    pthread_mutex_unlock(&mutex_s);
+    gettimeofday(&mytime, 0);
+    const int comp = mytime.tv_usec + time;
+
+    while (comp > mytime.tv_usec)
+        gettimeofday(&mytime, 0);
 }
 
-void    eating(int n)
+int    test(int n, t_philo *philo)
+{
+    const int   number = philo->sh_info->philo_num;
+    int         ret;
+
+    ret = 0;
+    if (philo->sh_info->fork_own[LEFT] != 2)
+    {
+        if (philo->sh_info->fork_own[RIGHT] != 2)
+            ret = 1;
+    }
+    return (ret);
+}
+
+void    print_start_eating(int n, t_philo *philo)
 {
     struct timeval mytime;
 
-    pthread_mutex_lock(&mutex_s);
-    if (fork_own[n - 1] == 2)
-    {
-        usleep(100);
-        fork_num[(n - 1 + 5) % 5] ++;
-        fork_num[(n - 2 + 5) % 5] ++;
-        fork_own[n - 1] = 0;
-        state[n - 1] ++;
-        gettimeofday(&mytime, NULL);
-        printf("at %d %dth philosopher finish eating! [%d], [%d], [%d], [%d], [%d]\n", mytime.tv_usec - start, n, fork_num[0], fork_num[1], fork_num[2], fork_num[3], fork_num[4]);
-        pthread_mutex_unlock(&mutex_s);
-    }
-    pthread_mutex_unlock(&mutex_s);
+    gettimeofday(&mytime, NULL);
+    printf("at %d %dth philosopher start eating! waiting time: %d, last eating: %d\n", 
+    mytime.tv_usec - philo->sh_info->start, n, 
+    mytime.tv_usec - philo->sh_info->former[n - 1],
+    philo->sh_info->former[n - 1] - philo->sh_info->start);
 }
 
-void sleeping(int n)
+void    print_finish_eating(int n, t_philo *philo)
 {
-    usleep(100);
-}
+    int i;
+    const int   number = philo->sh_info->philo_num;
 
-void thinking(int n)
-{
-    usleep(100);
-}
-
-void    *philo(void *data)
-{
-    uintptr_t n = (int)data;
-    int       flag = 0;
+    i = 0;
     struct timeval mytime;
 
-    while (state[n - 1] < 5)
+    gettimeofday(&mytime, NULL);
+    //printf("at %d %dth philosopher finish eating!\n", mytime.tv_usec - philo->sh_info->start, n);
+    //philo->sh_info->fork_num[(n + number) % number] ++;
+    //philo->sh_info->fork_num[(n - 2 + number) % number] ++;
+    //philo->sh_info->fork_own[n - 1] = 0;
+    philo->sh_info->state[n - 1] ++;
+    philo->sh_info->former[n - 1] = mytime.tv_usec;
+}
+
+void    print_picking(int n, t_philo *philo)
+{
+    int i;
+
+    i = 0;
+    struct timeval mytime;
+    gettimeofday(&mytime, NULL);
+    printf("at %d %dth philosopher grab the forks!\n ", mytime.tv_usec - philo->sh_info->start, n);
+}
+
+void    picking(int n, t_philo *philo)
+{
+    struct timeval mytime;
+    const int   number = philo->sh_info->philo_num;
+    int flag;
+
+    //print_picking(n, philo);
+    //philo->sh_info->fork_own[n - 1] += 2;
+}
+
+void    eating(int n, t_philo *philo)
+{
+    struct timeval mytime;
+    const int   number = philo->sh_info->philo_num;
+
+    /*if (philo->sh_info->fork_own[n - 1] == 2)
+    {   
+        print_start_eating(n, philo);
+        usleep(200);
+        print_finish_eating(n, philo);
+    }*/
+
+    print_start_eating(n, philo);
+    //ft_sleep(200);
+    usleep(200);
+    print_finish_eating(n, philo);
+}
+
+void sleeping(void)
+{
+    //ft_sleep(200);
+    usleep(200);
+}
+
+void thinking(void)
+{
+    //ft_sleep(200);
+    usleep(200);
+}
+
+void    *philo_routine(void *data)
+{
+    t_philo *philo = (t_philo *)data;
+    struct timeval mytime;
+    gettimeofday(&mytime, 0);
+    const int   n = philo->th_num + 1;
+    const int   number = philo->sh_info->philo_num;
+    int         flag;
+
+    philo->sh_info->former[n - 1] = mytime.tv_usec; //스레드의 탄생시점
+    while (philo->sh_info->state[n - 1] < 100)
     {
-        picking(n);
-        eating(n);
-        sleeping(n);
-        thinking(n);
+        /*if (n % 2 == 0)
+            usleep(100);
+        if (n == philo->sh_info->last + 2)
+        {
+            pthread_mutex_lock(&(philo->sh_info->mutex_c));
+            if (n == number - 1)
+                philo->sh_info->last = 0;
+            else
+                philo->sh_info->last = n;
+            pthread_mutex_unlock(&(philo->sh_info->mutex_c));
+            pthread_mutex_lock(&(philo->sh_info->mutex_s[LEFT]));
+            pthread_mutex_lock(&(philo->sh_info->mutex_s[RIGHT]));
+            picking(n, philo);
+            eating(n, philo);
+            pthread_mutex_unlock(&(philo->sh_info->mutex_s[LEFT]));
+            pthread_mutex_unlock(&(philo->sh_info->mutex_s[RIGHT]));
+            sleeping();
+            thinking();
+        } // 1 3 5 7 9 2 4 6 8 10을 강제하는 코드 -> 쓰레기*/
+
+        if (n % 2)
+            pthread_mutex_lock(&(philo->sh_info->mutex_s[RIGHT]));
+        else
+        {
+            usleep(200);
+            pthread_mutex_lock(&(philo->sh_info->mutex_s[LEFT]));
+        }
+        if (n % 2)
+            pthread_mutex_lock(&(philo->sh_info->mutex_s[LEFT]));
+        else
+            pthread_mutex_lock(&(philo->sh_info->mutex_s[RIGHT]));
+        picking(n, philo);
+        eating(n, philo);
+        if (n % 2)
+            pthread_mutex_unlock(&(philo->sh_info->mutex_s[RIGHT]));
+        else
+            pthread_mutex_unlock(&(philo->sh_info->mutex_s[LEFT]));
+        if (n % 2)
+            pthread_mutex_unlock(&(philo->sh_info->mutex_s[LEFT]));
+        else
+            pthread_mutex_unlock(&(philo->sh_info->mutex_s[RIGHT]));
+        sleeping();
+        thinking(); //비대칭으로 포크를 잡게 하여 데드락을 해결하는 코드
+
+        /*if (n % 2 == 0)
+            usleep(100);
+        pthread_mutex_lock(&(philo->sh_info->mutex_c));
+        flag = test(n, philo);
+        pthread_mutex_unlock(&(philo->sh_info->mutex_c));
+        if (flag == 1)
+        {
+            pthread_mutex_lock(&(philo->sh_info->mutex_s[LEFT]));
+            pthread_mutex_lock(&(philo->sh_info->mutex_s[RIGHT]));
+            picking(n, philo);
+            eating(n, philo);
+            pthread_mutex_unlock(&(philo->sh_info->mutex_s[LEFT]));
+            pthread_mutex_unlock(&(philo->sh_info->mutex_s[RIGHT]));
+        }
+        sleeping();
+        thinking();*/ //양 쪽 포크를 다 집을 수 있을 때만 잡게 하여 데드락을 해결하는 코드
     }
     return ((void *)n);
 }
 
-int main(void)
+int main(int argc, char *argv[])
 {
-    pthread_t thread_t[5];
     int status;
-    int j = 1;
-    int n = 1;
-    int index[5];
+    int j = 0;
+    const int   n = atoi(argv[1]);
+    t_philo *philo;
 
-    struct timeval mytime;
-    gettimeofday(&mytime, NULL);
-    start = mytime.tv_usec;
-    pthread_mutex_init(&mutex_s, 0);
-    pthread_mutex_init(&mutex_n, 0);
-    gettimeofday(&mytime, NULL);
-    while (n < 6)
+    philo = philo_init(n);
+    while (j < n)
     {
-        pthread_create(&thread_t[n - 1], NULL, philo, (void *)(uintptr_t)n);
-        n ++;
-    }
-    while (j < 6)
-    {
-        pthread_join(thread_t[j - 1], NULL);
+        pthread_create(&(philo[j].thread_t), NULL, philo_routine, (void *)(&philo[j]));
         j ++;
     }
-    pthread_mutex_destroy(&mutex_s);
-    pthread_mutex_destroy(&mutex_n);
-    //while(1);
+    j = 0;
+    while (j < n)
+    {
+        pthread_join(philo[j].thread_t, NULL);
+        j ++;
+    }
+    pthread_mutex_destroy(&(philo->sh_info->mutex_c));
+    free_all(philo);
 }
 //포크를 집는 시간: 31 25 31 25
 //41 32 23 22 31
+
