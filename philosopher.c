@@ -1,24 +1,14 @@
 #include "philosopher.h"
 
-void    ft_sleep(int time)
-{
-    struct timeval mytime;
-    gettimeofday(&mytime, 0);
-    const int comp = mytime.tv_usec + time;
-
-    while (comp > mytime.tv_usec)
-        gettimeofday(&mytime, 0);
-}
-
 int    test(int n, t_philo *philo)
 {
     const int   number = philo->sh_info->philo_num;
     int         ret;
 
     ret = 0;
-    if (philo->sh_info->fork_own[LEFT] != 2)
+    if (philo->sh_info->fork_num[LEFT] == 1)
     {
-        if (philo->sh_info->fork_own[RIGHT] != 2)
+        if (philo->sh_info->fork_num[RIGHT] ==1)
             ret = 1;
     }
     return (ret);
@@ -31,8 +21,8 @@ void    print_start_eating(int n, t_philo *philo)
     gettimeofday(&mytime, NULL);
     printf("at %d %dth philosopher start eating! waiting time: %d, last eating: %d\n", 
     mytime.tv_usec - philo->sh_info->start, n, 
-    mytime.tv_usec - philo->sh_info->former[n - 1],
-    philo->sh_info->former[n - 1] - philo->sh_info->start);
+    mytime.tv_usec - philo->former,
+    philo->former - philo->sh_info->start);
 }
 
 void    print_finish_eating(int n, t_philo *philo)
@@ -45,11 +35,7 @@ void    print_finish_eating(int n, t_philo *philo)
 
     gettimeofday(&mytime, NULL);
     //printf("at %d %dth philosopher finish eating!\n", mytime.tv_usec - philo->sh_info->start, n);
-    //philo->sh_info->fork_num[(n + number) % number] ++;
-    //philo->sh_info->fork_num[(n - 2 + number) % number] ++;
-    //philo->sh_info->fork_own[n - 1] = 0;
-    philo->sh_info->state[n - 1] ++;
-    philo->sh_info->former[n - 1] = mytime.tv_usec;
+    philo->former = mytime.tv_usec;
 }
 
 void    print_picking(int n, t_philo *philo)
@@ -69,6 +55,8 @@ void    picking(int n, t_philo *philo)
     int flag;
 
     //print_picking(n, philo);
+    philo->sh_info->fork_num[LEFT] --;
+    philo->sh_info->fork_num[RIGHT] --;
     //philo->sh_info->fork_own[n - 1] += 2;
 }
 
@@ -85,20 +73,21 @@ void    eating(int n, t_philo *philo)
     }*/
 
     print_start_eating(n, philo);
-    //ft_sleep(200);
     usleep(200);
     print_finish_eating(n, philo);
+    philo->sh_info->fork_num[LEFT] ++;
+    philo->sh_info->fork_num[RIGHT] ++;
+    //philo->sh_info->fork_own[n - 1] = 0;
+    philo->state ++;
 }
 
 void sleeping(void)
 {
-    //ft_sleep(200);
     usleep(200);
 }
 
 void thinking(void)
 {
-    //ft_sleep(200);
     usleep(200);
 }
 
@@ -111,8 +100,8 @@ void    *philo_routine(void *data)
     const int   number = philo->sh_info->philo_num;
     int         flag;
 
-    philo->sh_info->former[n - 1] = mytime.tv_usec; //스레드의 탄생시점
-    while (philo->sh_info->state[n - 1] < 100)
+    philo->former = mytime.tv_usec; //스레드의 탄생시점
+    while (philo->state < 100)
     {
         /*if (n % 2 == 0)
             usleep(100);

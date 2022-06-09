@@ -12,8 +12,8 @@ void    print_start_eating(int n, t_philo *philo)
     gettimeofday(&mytime, NULL);
     printf("at %d %dth philosopher start eating! waiting time: %d, last eating: %d\n", 
     mytime.tv_usec - philo->sh_info->start, n, 
-    mytime.tv_usec - philo->sh_info->former[n - 1],
-    philo->sh_info->former[n - 1] - philo->sh_info->start);
+    mytime.tv_usec - philo->former,
+    philo->former - philo->sh_info->start);
 }
 
 void    print_finish_eating(int n, t_philo *philo)
@@ -31,9 +31,9 @@ void    print_finish_eating(int n, t_philo *philo)
     //pthread_mutex_lock(&philo->sh_info->mutex_c);
     philo->sh_info->fork_num[(n + number) % number] ++;
     philo->sh_info->fork_num[(n - 2 + number) % number] ++;
-    philo->sh_info->fork_own[n - 1] = 0;
-    philo->sh_info->state[n - 1] ++;
-    philo->sh_info->former[n - 1] = mytime.tv_usec;
+    philo->fork_own = 0;
+    philo->state ++;
+    philo->former = mytime.tv_usec;
     //pthread_mutex_unlock(&philo->sh_info->mutex_c);
     pthread_mutex_unlock(&(philo->sh_info->mutex_s[(n + number) % number]));
     pthread_mutex_unlock(&(philo->sh_info->mutex_s[(n - 2 + number) % number]));
@@ -65,7 +65,7 @@ void    picking(int n, t_philo *philo)
         philo->sh_info->fork_num[(n + number) % number] --;
         philo->sh_info->fork_num[(n - 2 + number) % number] --;
         print_picking(n, philo);
-        philo->sh_info->fork_own[n - 1] += 2;
+        philo->fork_own += 2;
     }
     //pthread_mutex_unlock(&philo->sh_info->mutex_c);
     pthread_mutex_unlock(&(philo->sh_info->mutex_s[(n + number) % number]));
@@ -77,7 +77,7 @@ void    eating(int n, t_philo *philo)
     struct timeval mytime;
     const int   number = philo->sh_info->philo_num;
 
-    if (philo->sh_info->fork_own[n - 1] == 2)
+    if (philo->fork_own == 2)
     {   
         print_start_eating(n, philo);
         usleep(200);
@@ -103,8 +103,8 @@ void    *philo_routine(void *data)
     const int   n = philo->th_num + 1;
     const int   number = philo->sh_info->philo_num;
 
-    philo->sh_info->former[n - 1] = mytime.tv_usec;
-    while (philo->sh_info->state[n - 1] < 1)
+    philo->former = mytime.tv_usec;
+    while (philo->state < 1)
     {
         /*pthread_mutex_lock(&(philo->sh_info->mutex_s[(n + number) % number]));
         pthread_mutex_lock(&(philo->sh_info->mutex_s[(n - 2 + number) % number]));*/
@@ -115,7 +115,7 @@ void    *philo_routine(void *data)
         sleeping();
         //thinking();
     }
-    /*printf("%dth fork_own: %d / [%d], [%d], [%d], [%d], [%d]\n", n, philo->sh_info->fork_own[n - 1],
+    /*printf("%dth fork_own: %d / [%d], [%d], [%d], [%d], [%d]\n", n, philo->fork_own,
     philo->sh_info->fork_num[0], philo->sh_info->fork_num[1], philo->sh_info->fork_num[2], 
     philo->sh_info->fork_num[3], philo->sh_info->fork_num[4]);*/
     return ((void *)n);

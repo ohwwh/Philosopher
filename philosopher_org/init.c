@@ -15,6 +15,9 @@ t_philo	*philo_init(int num)
 	{
 		philo[i].th_num = i;
 		philo[i].sh_info = sh_info;
+		philo[i].fork_own = 0;
+		philo[i].state = 0;
+		philo[i].former = 0;
 		i ++;
 	}
 	return (philo);
@@ -30,13 +33,7 @@ t_info	*info_init(int num)
 	gettimeofday(&mytime, NULL);
 	sh_info = (t_info *)malloc(sizeof(t_info));
 	sh_info->fork_num = (int *)malloc(num * sizeof(int));
-	sh_info->fork_own = (int *)malloc(num * sizeof(int));
-	sh_info->state = (int *)malloc(num * sizeof(int));
-	sh_info->former = (int *)malloc(num * sizeof(int));
 	sh_info->mutex_s = (pthread_mutex_t *)malloc(num * sizeof(pthread_mutex_t));
-	memset(sh_info->fork_own, 0, num * sizeof(int));
-	memset(sh_info->state, 0, num * sizeof(int));
-	memset(sh_info->former, 0, num * sizeof(int));
 	sh_info->start = mytime.tv_usec;
 	while (i < num)
 	{
@@ -52,9 +49,6 @@ t_info	*info_init(int num)
 void	free_all(t_philo *philo)
 {
 	free(philo->sh_info->fork_num);
-	free(philo->sh_info->fork_own);
-	free(philo->sh_info->state);
-	free(philo->sh_info->former);
 	free(philo->sh_info->mutex_s);
 	free(philo->sh_info);
 	free(philo);

@@ -13,19 +13,19 @@ typedef struct s_info
 {
 	int	philo_num;
 	int *fork_num;
-	int *fork_own; // 공유변수일 필요 x
-	int *state;	// 공유변수일 필요 x
-	int *former; // 공유변수일 필요 x
-	pthread_mutex_t *mutex_s;
 	int	start;
 	int	last;
 	pthread_mutex_t mutex_c;
-}t_info;
+	pthread_mutex_t *mutex_s;
+}t_info; //공유자원들
 
 typedef struct s_philo
 {
 	int	th_num;
 	int	start;
+	int fork_own;
+	int state;
+	int former;
 	pthread_t thread_t;
 	t_info *sh_info;
 }t_philo;
