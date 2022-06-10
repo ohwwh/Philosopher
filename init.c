@@ -57,4 +57,6 @@ void	free_all(t_philo *philo)
 	free(philo->sh_info->mutex_s);
 	free(philo->sh_info);
 	free(philo);
+	//철학자 스레드들이 돌아가는 와중에 free된 메모리를 건드릴수도 있음
+	//철학자 스레드들을 모조리 종료시키고 메인 스레드를 종료 시키는 방향으로 다시 짜야 하나......?
 }

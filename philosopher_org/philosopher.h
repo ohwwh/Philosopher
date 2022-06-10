@@ -6,29 +6,29 @@
 #include <pthread.h>
 #include <stdint.h>
 
+#define LEFT     (n - 1 + number) % number
+#define RIGHT    (n - 2 + number) % number
+
 typedef struct s_info
 {
 	int	philo_num;
 	int *fork_num;
-	//int *fork_own; // 공유변수일 필요 x
-	//int *state;	// 공유변수일 필요 x
-	//int *former; // 공유변수일 필요 x
-	pthread_mutex_t *mutex_s;
-	int	start;
-	int	last;
+	int	std_sec;
+	int	std_usec;
+	int	end;
 	pthread_mutex_t mutex_c;
-}t_info;
+	pthread_mutex_t *mutex_s;
+}t_info; //공유자원들
 
 typedef struct s_philo
 {
 	int	th_num;
-	int	start;
-	int	fork_own;
-	int	state;
-	int	former;
+	int fork_own;
+	int state;
+	long former;
 	pthread_t thread_t;
 	t_info *sh_info;
-}t_philo;
+}t_philo; //철학자 개개인의 속성들
 
 t_philo	*philo_init(int num);
 t_info	*info_init(int num);
