@@ -8,6 +8,8 @@ t_philo	*philo_init(int num)
 	t_philo *philo;
 	t_info *sh_info;
 
+	//struct timeval mytime;
+	//gettimeofday(&mytime, NULL);
 	i = 0;
 	philo = (t_philo *)malloc(num * sizeof(t_philo));
 	sh_info = info_init(num);
@@ -18,6 +20,7 @@ t_philo	*philo_init(int num)
 		philo[i].fork_own = 0;
 		philo[i].state = 0;
 		philo[i].former = 0;
+		//philo[i].start = mytime.tv_usec;
 		i ++;
 	}
 	return (philo);
@@ -34,8 +37,9 @@ t_info	*info_init(int num)
 	sh_info = (t_info *)malloc(sizeof(t_info));
 	sh_info->fork_num = (int *)malloc(num * sizeof(int));
 	sh_info->mutex_s = (pthread_mutex_t *)malloc(num * sizeof(pthread_mutex_t));
-	sh_info->start = mytime.tv_usec;
-	sh_info->last = -1;
+	sh_info->std_usec = mytime.tv_usec;
+	sh_info->std_sec = mytime.tv_sec;
+	sh_info->end = 0;
 	while (i < num)
 	{
 		sh_info->fork_num[i] = 1;

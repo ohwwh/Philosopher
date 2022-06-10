@@ -8,19 +8,27 @@
 
 int start;
 
+void	eating(int n)
+{
+	struct timeval mytime;
+	gettimeofday(&mytime, 0);
+	printf("%d : %d\n", n, mytime.tv_usec);
+}
+
 void	*routine(void *data)
 {
 	int n = (intptr_t)data;
-	struct timeval mytime;
-	gettimeofday(&mytime, 0);
-	printf("at %d %dth thread is created\n", mytime.tv_usec - start, n + 1);
+	//struct timeval mytime;
+	//gettimeofday(&mytime, 0);
+	//printf("at %d %dth thread is created\n", mytime.tv_usec - start, n + 1);
+	eating(n);
 	return ((void *)n);
 }
 
 int	main(void)
 {
 	pthread_t thread[100];
-	int	n = 100;
+	int	n = 5;
 	int	j = 0;
 	struct timeval mytime;
 
