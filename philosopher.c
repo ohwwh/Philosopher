@@ -8,8 +8,11 @@ void    ft_msleep(int time)
     gettimeofday(&mytime, 0);
     target = time + (mytime.tv_sec * 1000) + (mytime.tv_usec / 1000);
     while (target > (mytime.tv_sec * 1000) + (mytime.tv_usec / 1000))
+    {
         gettimeofday(&mytime, 0);
-}
+        usleep(100);
+    }
+    }
 
 int is_one(int n, t_philo *philo)
 {
@@ -128,15 +131,15 @@ void    eating(int n, t_philo *philo)
     const int   number = philo->sh_info->philo_num;
 
     start_eating(n, philo);
-    //ft_msleep(200);
-    usleep(200 * 1000);
+    ft_msleep(200);
+    //usleep(200 * 1000);
     finish_eating(n, philo);
 }
 
 void sleeping(void)
 {
-    //ft_msleep(200);
-    usleep(200 * 1000);
+    ft_msleep(200);
+    //usleep(200 * 1000);
 }
 
 void thinking(void)
