@@ -6,13 +6,13 @@ void    ft_msleep(int time)
     long target;
 
     gettimeofday(&mytime, 0);
-    target = time + (mytime.tv_sec * 1000) + (mytime.tv_usec / 1000);
-    while (target > (mytime.tv_sec * 1000) + (mytime.tv_usec / 1000))
+    target = time * 1000 + (mytime.tv_sec * 1000000) + (mytime.tv_usec);
+    while (target > (mytime.tv_sec * 1000000) + (mytime.tv_usec))
     {
+        usleep(1000);
         gettimeofday(&mytime, 0);
-        usleep(100);
     }
-    }
+}
 
 int is_one(int n, t_philo *philo)
 {
@@ -33,11 +33,11 @@ void    ft_mutex_lock(int n, t_philo *philo)
 {
     const int       number = philo->sh_info->philo_num;
 
-    if (RIGHT == LEFT)
+    /*if (RIGHT == LEFT)
     {
         pthread_mutex_lock(&(philo->sh_info->mutex_s[RIGHT]));
         return ;
-    }
+    }*/
     if (n % 2)
         pthread_mutex_lock(&(philo->sh_info->mutex_s[RIGHT]));
     else
@@ -56,11 +56,11 @@ void    ft_mutex_unlock(int n, t_philo *philo)
 {
     const int       number = philo->sh_info->philo_num;
 
-    if (RIGHT == LEFT)
+    /*if (RIGHT == LEFT)
     {
         pthread_mutex_unlock(&(philo->sh_info->mutex_s[RIGHT]));
         return ;
-    }
+    }*/
     if (n % 2)
         pthread_mutex_unlock(&(philo->sh_info->mutex_s[RIGHT]));
     else
@@ -88,12 +88,14 @@ void    start_eating(int n, t_philo *philo)
     long            wait;
 
     gettimeofday(&mytime, NULL);
+    pthread_mutex_lock(&(philo->sh_info->mutex_m[n -  1]));
     wait = time_stamp(mytime.tv_sec, mytime.tv_usec, philo) - philo->former;
     printf("at %ld %dth philosopher start eating! waiting time: %ld, last eating: %ld\n", 
     time_stamp(mytime.tv_sec, mytime.tv_usec, philo), n, 
     wait,
     philo->former);
     philo->former = time_stamp(mytime.tv_sec, mytime.tv_usec, philo);
+    pthread_mutex_unlock(&(philo->sh_info->mutex_m[n - 1]));
 }
 
 void    finish_eating(int n, t_philo *philo)
@@ -113,16 +115,7 @@ int picking(int n, t_philo *philo)
 
     gettimeofday(&mytime, NULL);
     wait = time_stamp(mytime.tv_sec, mytime.tv_usec, philo) - philo->former;
-    if (wait > 410)
-    {
-        pthread_mutex_lock(&(philo->sh_info->mutex_c));
-        printf("at %ld %dth philosopher died - RIP\n", wait + philo->former, n);
-        philo->sh_info->end = 1;
-        pthread_mutex_unlock(&(philo->sh_info->mutex_c));
-        return (1);
-    }
-    else
-        printf("at %ld %dth philosopher grab the forks!\n ", time_stamp(mytime.tv_sec, mytime.tv_usec, philo), n);
+    printf("at %ld %dth philosopher grab the forks!\n ", wait + philo->former, n);
     return (0);
 }
 
@@ -157,6 +150,18 @@ void    *philo_routine(void *data)
     philo = (t_philo *)data;
     const int       n = philo->th_num + 1;
     const int       number = philo->sh_info->philo_num;
+    while (1)
+    {
+        pthread_mutex_lock(&(philo->sh_info->mutex_c));
+        if (philo->sh_info->cnt != number)
+            philo->sh_info->cnt ++;
+        if (philo->sh_info->cnt == number)
+        {
+            pthread_mutex_unlock(&(philo->sh_info->mutex_c));
+            break ;
+        }
+        pthread_mutex_unlock(&(philo->sh_info->mutex_c));
+    }
     gettimeofday(&mytime, 0);
     philo->former = time_stamp(mytime.tv_sec, mytime.tv_usec, philo);
     while (philo->state < 100)
@@ -174,6 +179,33 @@ void    *philo_routine(void *data)
     return ((void *)n);
 }
 
+void    monitoring(t_philo  *philo, int n)
+{
+    int j;
+    struct timeval mytime;
+    long    current_time;
+
+     while (1)
+    {
+        j = 0;
+        while (j < n)
+        {
+            gettimeofday(&mytime, 0);
+            current_time = time_stamp(mytime.tv_sec, mytime.tv_usec, philo);
+            pthread_mutex_lock(&(philo->sh_info->mutex_m[j]));
+            if (current_time - philo[j].former > 610)
+            {
+                pthread_mutex_unlock(&(philo->sh_info->mutex_m[j]));
+                printf("at %ld %dth philosopher died - RIP: last eating: %ld\n", current_time, n, philo[j].former);
+                return ;
+            }
+            pthread_mutex_unlock(&(philo->sh_info->mutex_m[j]));
+            j ++;
+        }
+        usleep(500);
+    }
+}
+
 int main(int argc, char *argv[])
 {
     int         j;
@@ -188,7 +220,8 @@ int main(int argc, char *argv[])
         pthread_detach(philo[j].thread_t);
         j ++;
     }
-    while (1)
+    monitoring(philo, n);
+    /*while (1)
     {
         pthread_mutex_lock(&(philo->sh_info->mutex_c));
         if (philo->sh_info->end != 0)
@@ -197,7 +230,7 @@ int main(int argc, char *argv[])
             break ;
         }
         pthread_mutex_unlock(&(philo->sh_info->mutex_c));
-    }
+    }*/
     j = 0;
     while (j < n)
         pthread_mutex_destroy(&(philo->sh_info->mutex_s[j ++]));

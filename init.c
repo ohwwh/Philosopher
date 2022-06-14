@@ -37,13 +37,16 @@ t_info	*info_init(int num)
 	sh_info = (t_info *)malloc(sizeof(t_info));
 	sh_info->fork_num = (int *)malloc(num * sizeof(int));
 	sh_info->mutex_s = (pthread_mutex_t *)malloc(num * sizeof(pthread_mutex_t));
+	sh_info->mutex_m = (pthread_mutex_t *)malloc(num * sizeof(pthread_mutex_t));
 	sh_info->std_usec = mytime.tv_usec;
 	sh_info->std_sec = mytime.tv_sec;
 	sh_info->end = 0;
+	sh_info->cnt = 0;
 	while (i < num)
 	{
 		sh_info->fork_num[i] = 1;
 		pthread_mutex_init(&(sh_info->mutex_s[i]), 0);
+		pthread_mutex_init(&(sh_info->mutex_m[i]), 0);
 		i ++;
 	}
 	sh_info->philo_num = num;
@@ -55,6 +58,7 @@ void	free_all(t_philo *philo)
 {
 	free(philo->sh_info->fork_num);
 	free(philo->sh_info->mutex_s);
+	free(philo->sh_info->mutex_m);
 	free(philo->sh_info);
 	free(philo);
 	//철학자 스레드들이 돌아가는 와중에 free된 메모리를 건드릴수도 있음

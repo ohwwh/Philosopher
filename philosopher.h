@@ -16,8 +16,10 @@ typedef struct s_info
 	int	std_sec;
 	int	std_usec;
 	int	end;
+	int	cnt;
 	pthread_mutex_t mutex_c;
 	pthread_mutex_t *mutex_s;
+	pthread_mutex_t	*mutex_m;
 }t_info; //공유자원들
 
 typedef struct s_philo
