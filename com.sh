@@ -1,1 +1,0 @@
-gcc -g -lpthread philosopher.c init.c -o philosopher
