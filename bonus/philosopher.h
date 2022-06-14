@@ -5,6 +5,7 @@
 #include <memory.h>
 #include <pthread.h>
 #include <stdint.h>
+#include <semaphore.h>
 
 #define LEFT     (n - 1 + number) % number
 #define RIGHT    (n - 2 + number) % number
