@@ -77,9 +77,9 @@ long    time_stamp(long sec, long usec, t_philo *philo)
     long    s_ret;
     long    u_ret;
 
-    s_ret = (sec - philo->sh_info->std_sec) * 1000000;
-    u_ret = usec - philo->sh_info->std_usec;
-    ret = (s_ret + u_ret) / 1000;
+    s_ret = (sec - philo->sh_info->std_sec) * 1000;
+    u_ret = (usec - philo->sh_info->std_usec) / 1000;
+    ret = s_ret + u_ret;
     return (ret);
 }
 void    start_eating(int n, t_philo *philo)
@@ -113,7 +113,7 @@ int picking(int n, t_philo *philo)
 
     gettimeofday(&mytime, NULL);
     wait = time_stamp(mytime.tv_sec, mytime.tv_usec, philo) - philo->former;
-    if (wait > 609)
+    if (wait > 410)
     {
         pthread_mutex_lock(&(philo->sh_info->mutex_c));
         printf("at %ld %dth philosopher died - RIP\n", wait + philo->former, n);
