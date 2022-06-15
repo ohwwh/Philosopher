@@ -5,8 +5,6 @@
 #include <memory.h>
 #include <pthread.h>
 #include <stdint.h>
-#include <semaphore.h>
-#include <errno.h>
 
 #define LEFT     (n - 1 + number) % number
 #define RIGHT    (n - 2 + number) % number
@@ -40,7 +38,7 @@ typedef struct s_philo
 
 
 void    monitoring(t_philo  *philo, int n);
-void    *routine(t_philo *philo);
+void    *routine(void *data);
 int 	picking(int n, t_philo *philo);
 int 	eating(int n, t_philo *philo);
 void    sleeping(t_philo *philo);
@@ -48,9 +46,7 @@ void	thinking(void);
 void    ft_msleep(int time);
 void    fork_mutex_lock(int n, t_philo *philo);
 void    fork_mutex_unlock(int n, t_philo *philo);
-long    stamp(long sec, long usec, t_info *sh_info);
+long    stamp(long sec, long usec, t_philo *philo);
 t_philo	*philo_init(int argc, char *argv[]);
 t_info	*info_init(int argc, char *argv[]);
 void	free_all(t_philo *philo);
-
-char	*ft_itoa(int n);

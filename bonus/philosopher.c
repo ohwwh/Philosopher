@@ -1,13 +1,54 @@
 #include "philosopher.h"
 
-void	aroutine(int n)
+void	info_init_new(t_info *sh_info)
 {
-	printf("%d process\n", n);
+	struct timeval mytime;
+
+	gettimeofday(&mytime, 0);
+	sh_info->std_sec = mytime.tv_sec;
+	sh_info->std_usec = mytime.tv_usec;
+}
+
+void	free_sem(int n, sem_t **sem_arr)
+{
+	sem_unlink("forks");
+	sem_close(sem_arr[0]);
+	free(sem_arr);
+}
+
+void	aroutine(int n, sem_t **sem_arr, t_info *sh_info)
+{
+	int	state;
+	int	i;
+	struct timeval mytime;
+
+	state = 0;
+	while (state < 1)
+	{
+		if (n % 2 && state == 0)
+			usleep(200 * 1000);
+		sem_wait(sem_arr[0]);
+		sem_wait(sem_arr[0]);
+		gettimeofday(&mytime, 0);
+		printf("at %ld %d grabs the fork\n", stamp(mytime.tv_sec, mytime.tv_usec, sh_info), n);
+		printf("at %ld %d start eating\n", stamp(mytime.tv_sec, mytime.tv_usec, sh_info), n);
+		usleep(200 * 1000);
+		gettimeofday(&mytime, 0);
+		printf("at %ld %d finish eating\n", stamp(mytime.tv_sec, mytime.tv_usec, sh_info), n);
+		sem_post(sem_arr[0]);
+		sem_post(sem_arr[0]);
+		printf("at %ld %d start sleeping\n", stamp(mytime.tv_sec, mytime.tv_usec, sh_info), n);
+		usleep(200 * 1000);
+		gettimeofday(&mytime, 0);
+		printf("at %ld %d start thinking\n", stamp(mytime.tv_sec, mytime.tv_usec, sh_info), n);
+		usleep(200);
+		state ++;
+	}
 }
 
 int	main(int argc, char *argv[])
 {
-	int		j;
+	int		i;
 	t_philo	*philo;
 	int		pid;
 	int		status;
@@ -15,39 +56,52 @@ int	main(int argc, char *argv[])
 	int		*proc_arr;
 	char	*str;
 	sem_t **sem_arr;
+	t_info	*sh_info;
+	int		*pids;
+
 
 	pid = 1;
-	n = 5;
-	sem_arr = (sem_t **)malloc(sizeof(sem_t *) * n);
-	str = ft_itoa(n);
-	printf("%s\n", str);
-	sem_arr[0] = sem_open(str, O_CREAT, S_IXUSR, 1);
+	n = 4;
 	/*if (argc != 6 && argc != 5)
 		return (printf("Arguments error!\n"));*/
-	j = 0;
-	while (j < n)
+	i = 0;
+	sem_arr = (sem_t **)malloc(sizeof(sem_t *) * 1);
+	sh_info = (t_info *)malloc(sizeof(t_info));
+	pids = (int *)malloc(sizeof(int) * n);
+	sem_arr[0] = sem_open("forks", O_CREAT, S_IXUSR, n);
+	info_init_new(sh_info);
+	i = 0;
+	while (i < n)
 	{
 		if (pid > 0)
+		{
 			pid = fork();
+			pids[i] = pid;
+		}
 		else
 			break ;
-		j ++;
+		i ++;
 	}
 	if (pid > 0)
 	{
-		waitpid(pid, &status, 0);
-		printf("I am your father\n");
-		printf("%d, errno: %d\n", sem_arr[0], errno);
-		sem_unlink(str);
-		sem_close(sem_arr[0]);
-		free(str);
-		free(sem_arr);
+		waitpid(pids[0], &status, 0);
+		waitpid(pids[1], &status, 0);
+		waitpid(pids[2], &status, 0);
+		waitpid(pids[3], &status, 0);
+		//printf("I am your father\n");
+		//printf("%d, errno: %d\n", sem_arr[0], errno);
+		free_sem(n, sem_arr);
+		free(sh_info);
+		free(pids);
+		return (1);
 	}
 	else
 	{
 		//printf("I am a child\n");
-		aroutine(j);
-		free(str);
-		free(sem_arr);
+		aroutine(i, sem_arr, sh_info);
+		free_sem(n, sem_arr);
+		free(sh_info);
+		free(pids);
+		return (1);
 	}
 }

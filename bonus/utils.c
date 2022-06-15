@@ -46,14 +46,14 @@ void    fork_mutex_unlock(int n, t_philo *philo)
         pthread_mutex_unlock(&(philo->sh_info->mutex_s[RIGHT]));
 }
 
-long    stamp(long sec, long usec, t_philo *philo)
+long    stamp(long sec, long usec, t_info *sh_info)
 {
     long    ret;
     long    s_ret;
     long    u_ret;
 
-    s_ret = (sec - philo->sh_info->std_sec) * 1000;
-    u_ret = (usec - philo->sh_info->std_usec) / 1000;
+    s_ret = (sec - sh_info->std_sec) * 1000;
+    u_ret = (usec - sh_info->std_usec) / 1000;
     ret = s_ret + u_ret;
     return (ret);
 }

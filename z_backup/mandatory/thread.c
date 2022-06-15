@@ -45,12 +45,14 @@ static void    simulation(int n, int number, t_philo *philo)
     }
 }
 
-void    *routine(t_philo *philo)
+void    *routine(void *data)
 {
+    t_philo         *philo;
     struct timeval  mytime;
     int             n;
     int             number;
 
+    philo = (t_philo *)data;
     n = philo->th_num + 1;
     number = philo->sh_info->philo_num; 
     start_simulation(number, philo);
