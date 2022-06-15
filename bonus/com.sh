@@ -1,1 +1,1 @@
-gcc -g -lpthread philosopher.c -o philosopher
+gcc -g -lpthread philosopher.c libohw.c -o philosopher

@@ -6,6 +6,7 @@
 #include <pthread.h>
 #include <stdint.h>
 #include <semaphore.h>
+#include <errno.h>
 
 #define LEFT     (n - 1 + number) % number
 #define RIGHT    (n - 2 + number) % number
@@ -51,3 +52,5 @@ long    stamp(long sec, long usec, t_philo *philo);
 t_philo	*philo_init(int argc, char *argv[]);
 t_info	*info_init(int argc, char *argv[]);
 void	free_all(t_philo *philo);
+
+char	*ft_itoa(int n);
