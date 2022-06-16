@@ -28,7 +28,7 @@ typedef struct s_info
 	sem_t *fork;
 	sem_t *deadlock_check;
 	sem_t *end_death;
-	sem_t **end_eat
+	sem_t **end_eat;
 }t_info; //공유자원들
 
 typedef struct s_philo

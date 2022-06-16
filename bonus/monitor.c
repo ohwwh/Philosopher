@@ -19,7 +19,7 @@ static void	end_philo(t_philo *philo)
 {
 	if (philo->state == philo->sh_info->must_eat)
 	{
-		sem_post(philo);
+		sem_post(philo->sh_info->end_eat[philo->th_num - 1]);
 		pthread_mutex_unlock(&(philo->sh_info->mutex_c));
 		exit(1);
 	}
@@ -39,11 +39,8 @@ static void	check_death(t_philo *philo)
 	{
 		printf("at %ld %dth died\n", current_time, philo->th_num);
 		//printf(" - RIP: last eating: %ld\n", philo[j].former);
-		while (i < philo->sh_info->end_eat)
-		{
-			sem_post(philo->sh_info->end_eat);
-			i ++;
-		}
+		while (i < philo->sh_info->philo_num)
+			sem_post(philo->sh_info->end_eat[i ++]);
 		pthread_mutex_unlock(&(philo->sh_info->mutex_c));
 		exit(1);
 	}
@@ -57,7 +54,7 @@ void	*monitoring_routine(void *data)
 	while (1)
 	{
 		pthread_mutex_lock(&(philo->sh_info->mutex_c));
-		//end_philo(philo);
+		end_philo(philo);
 		check_death(philo);
 		pthread_mutex_unlock(&(philo->sh_info->mutex_c));
 	}
