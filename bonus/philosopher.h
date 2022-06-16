@@ -7,6 +7,7 @@
 #include <stdint.h>
 #include <semaphore.h>
 #include <errno.h>
+#include <signal.h>
 
 #define LEFT     (n - 1 + number) % number
 #define RIGHT    (n - 2 + number) % number
@@ -26,6 +27,8 @@ typedef struct s_info
 	pthread_mutex_t mutex_c;
 	sem_t *fork;
 	sem_t *deadlock_check;
+	sem_t *end_death;
+	sem_t *end_eat
 }t_info; //공유자원들
 
 typedef struct s_philo

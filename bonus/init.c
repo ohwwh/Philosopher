@@ -45,7 +45,9 @@ t_info	*info_init(int argc, char *argv[])
 	sh_info->end = 0;
 	sh_info->cnt = 0;
 	sh_info->fork = sem_open("forks", O_CREAT, S_IXUSR, num);
-	sh_info->deadlock_check = sem_open("deadlock", O_CREAT, S_IXUSR, num);
+	sh_info->deadlock_check = sem_open("deadlock", O_CREAT, S_IXUSR, (num / 2));
+	sh_info->end_death = sem_open("end_death", O_CREAT, S_IXUSR, 0);
+	sh_info->end_eat = sem_open("end_eat", O_CREAT, S_IXUSR, num);
 	pthread_mutex_init(&(sh_info->mutex_c), 0);
 	return (sh_info);
 }
@@ -56,6 +58,10 @@ void	free_all(t_philo *philo)
 	sem_close(philo->sh_info->fork);
 	sem_unlink("deadlock");
 	sem_close(philo->sh_info->deadlock_check);
+	sem_unlink("end_death");
+	sem_close(philo->sh_info->end_death);
+	sem_unlink("end_eat");
+	sem_close(philo->sh_info->end_eat);
 	pthread_mutex_destroy(&(philo->sh_info->mutex_c));
 	free(philo->sh_info);
 	free(philo);

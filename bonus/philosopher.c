@@ -17,7 +17,7 @@ void	aroutine(int n, t_philo *philo)
 	int	i;
 	struct timeval mytime;
 
-	while (philo->state < 1)
+	while (philo->state < 100)
 	{
 		if (n % 2 && philo->state == 0)
 			ft_msleep(200);
@@ -78,8 +78,9 @@ int	main(int argc, char *argv[])
 	if (pid > 0)
 	{
 		i = 0;
+		sem_wait(philo->sh_info->end_death);
 		while (i < philo->sh_info->philo_num)
-			waitpid(pids[i ++], &status, 0);
+			kill(pids[i ++], SIGUSR1);
 		free_all(philo);
 		free(pids);
 		/*printf("%d\n", getpid());
@@ -91,8 +92,8 @@ int	main(int argc, char *argv[])
 		//printf("I am a child\n");
 		philo->th_num = i;
 		pthread_create(&thread_t, 0, monitoring_routine, (void *)philo);
-		pthread_detach(thread_t);
 		aroutine(i, philo);
+		pthread_join(thread_t, 0);
 		free_all(philo);
 		free(pids);
 		return (1);

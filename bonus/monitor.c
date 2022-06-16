@@ -17,12 +17,11 @@ static int	end_simulation(t_philo *philo)
 
 static void	end_philo(t_philo *philo)
 {
-	if (philo->end == 1)
+	if (philo->state == philo->sh_info->must_eat)
 	{
-		pthread_mutex_lock(&(philo->sh_info->mutex_c));
-		philo->sh_info->end += 1;
+		sem_post(philo->sh_info->end_eat);
 		pthread_mutex_unlock(&(philo->sh_info->mutex_c));
-		philo->end += 1;
+		exit(1);
 	}
 }
 
@@ -34,14 +33,13 @@ static void	check_death(t_philo *philo)
 
 	gettimeofday(&mytime, 0);
 	current_time = stamp(mytime.tv_sec, mytime.tv_usec, philo);
-	if (philo->end < 1 && philo->sh_info->death != 1)
+	if (current_time - philo->former > time_to_die)
 	{
-		if (current_time - philo->former > time_to_die)
-		{
-			printf("at %ld %dth died", current_time, philo->th_num);
-			//printf(" - RIP: last eating: %ld\n", philo[j].former);
-			philo->sh_info->death = 1;
-		}
+		printf("at %ld %dth died\n", current_time, philo->th_num);
+		//printf(" - RIP: last eating: %ld\n", philo[j].former);
+		sem_post(philo->sh_info->end_death);
+		pthread_mutex_unlock(&(philo->sh_info->mutex_c));
+		exit(1);
 	}
 }
 
@@ -57,5 +55,6 @@ void	*monitoring_routine(void *data)
 		check_death(philo);
 		pthread_mutex_unlock(&(philo->sh_info->mutex_c));
 	}
+	usleep(500);
 	return (0);
 }
