@@ -27,7 +27,6 @@ typedef struct s_info
 	pthread_mutex_t mutex_c;
 	sem_t *fork;
 	sem_t *deadlock_check;
-	sem_t *end_death;
 	sem_t **end_eat;
 }t_info; //공유자원들
 

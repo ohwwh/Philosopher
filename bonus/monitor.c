@@ -35,6 +35,7 @@ static void	check_death(t_philo *philo)
 	i = 0;
 	gettimeofday(&mytime, 0);
 	current_time = stamp(mytime.tv_sec, mytime.tv_usec, philo);
+
 	if (current_time - philo->former > time_to_die)
 	{
 		printf("at %ld %dth died\n", current_time, philo->th_num);

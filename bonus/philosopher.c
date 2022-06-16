@@ -17,7 +17,17 @@ void	aroutine(int n, t_philo *philo)
 	int	i;
 	struct timeval mytime;
 
-	while (philo->state < 100)
+	i = 0;
+	//sem_post(philo->sh_info->end_eat[philo->th_num - 1]);
+	/*while (i < philo->sh_info->philo_num)
+	{
+		if (i != philo->th_num - 1)
+			sem_wait(philo->sh_info->end_eat[i]);
+		i ++;
+	}*/
+	gettimeofday(&mytime, 0);
+	philo->former = stamp(mytime.tv_sec, mytime.tv_usec, philo);
+	while (1)
 	{
 		if (n % 2 && philo->state == 0)
 			ft_msleep(200);
@@ -31,7 +41,8 @@ void	aroutine(int n, t_philo *philo)
 		philo->former = stamp(mytime.tv_sec, mytime.tv_usec, philo);
 		ft_msleep(philo->sh_info->time_to_eat);
 		gettimeofday(&mytime, 0);
-		printf("at %ld %d finish eating\n", stamp(mytime.tv_sec, mytime.tv_usec, philo), n);
+		philo->state ++;
+		printf("at %ld %d finish eating     [%d]\n", stamp(mytime.tv_sec, mytime.tv_usec, philo), n, philo->state);
 		sem_post(philo->sh_info->fork);
 		sem_post(philo->sh_info->fork);
 		sem_post(philo->sh_info->deadlock_check);
@@ -40,7 +51,6 @@ void	aroutine(int n, t_philo *philo)
 		gettimeofday(&mytime, 0);
 		//printf("at %ld %d start thinking\n", stamp(mytime.tv_sec, mytime.tv_usec, sh_info), n);
 		usleep(200);
-		philo->state ++;
 	}
 }
 
@@ -83,6 +93,8 @@ int	main(int argc, char *argv[])
 		i = 0;
 		while (i < philo->sh_info->philo_num)
 			kill(pids[i ++], SIGUSR1);
+		//while (i < philo->sh_info->philo_num)
+		//	waitpid(pids[i ++], 0, 0);
 		free_all(philo);
 		free(pids);
 		/*printf("%d\n", getpid());
