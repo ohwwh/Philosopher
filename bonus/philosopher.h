@@ -39,7 +39,7 @@ typedef struct s_philo
 }t_philo; //철학자 개개인의 속성들
 
 
-void    monitoring(t_philo  *philo, int n);
+void    monitoring(int n);
 void    *routine(t_philo *philo);
 int 	picking(int n, t_philo *philo);
 int 	eating(int n, t_philo *philo);

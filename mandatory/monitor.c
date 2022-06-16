@@ -49,7 +49,7 @@ static void	check_death(int j, t_philo *philo)
 
 void	monitoring(t_philo *philo, int n)
 {
-	int				j;
+	int	j;
 
 	while (1)
 	{

@@ -1,5 +1,23 @@
 #include "philosopher.h"
 
+void	monioring(int n, sem_t **sem_death)
+{
+	int	;
+
+	while (1)
+	{
+		j = 0;
+		while (j < n)
+		{
+			sem_wait(sem_death[j - 1]);
+			
+			sem_post(sem_death[j - 1]);
+			j ++;
+		}
+		usleep(500);
+	}
+}
+
 void	info_init_new(t_info *sh_info)
 {
 	struct timeval mytime;
@@ -9,12 +27,23 @@ void	info_init_new(t_info *sh_info)
 	sh_info->std_usec = mytime.tv_usec;
 }
 
-void	free_sem(int n, sem_t **sem_arr)
+void	free_sem(int n, char **name_arr, sem_t **sem_arr, sem_t **sem_death)
 {
+	int	i;
+
+	i = 0;
 	sem_unlink("forks");
 	sem_close(sem_arr[0]);
 	sem_unlink("state");
 	sem_close(sem_arr[1]);
+	while (i < n)
+	{
+		sem_unlink(name_arr[i]);
+		sem_close(sem_death[i]);
+		free(name_arr[i]);
+		i ++;
+	}
+	free(name_arr);
 	free(sem_arr);
 }
 
@@ -45,10 +74,10 @@ void	aroutine(int n, sem_t **sem_arr, t_info *sh_info)
 		sem_post(sem_arr[0]);
 		sem_post(sem_arr[0]);
 		sem_post(sem_arr[1]);
-		printf("at %ld %d start sleeping\n", stamp(mytime.tv_sec, mytime.tv_usec, sh_info), n);
+		//printf("at %ld %d start sleeping\n", stamp(mytime.tv_sec, mytime.tv_usec, sh_info), n);
 		ft_msleep(200);
 		gettimeofday(&mytime, 0);
-		printf("at %ld %d start thinking\n", stamp(mytime.tv_sec, mytime.tv_usec, sh_info), n);
+		//printf("at %ld %d start thinking\n", stamp(mytime.tv_sec, mytime.tv_usec, sh_info), n);
 		usleep(200);
 		state ++;
 	}
@@ -63,7 +92,9 @@ int	main(int argc, char *argv[])
 	int		n;
 	int		*proc_arr;
 	char	*str;
-	sem_t **sem_arr;
+	char	**name_arr;
+	sem_t **sem_arr; // 포크 + 데드락 방지 세마포어
+	sem_t **sem_death; // 죽음 측정용 세마포어
 	t_info	*sh_info;
 	int		*pids;
 
@@ -74,10 +105,20 @@ int	main(int argc, char *argv[])
 		return (printf("Arguments error!\n"));*/
 	i = 0;
 	sem_arr = (sem_t **)malloc(sizeof(sem_t *) * 2);
+	sem_death = (sem_t **)malloc(sizeof(sem_t *) * n);
 	sh_info = (t_info *)malloc(sizeof(t_info));
 	pids = (int *)malloc(sizeof(int) * n);
+	name_arr = (char **)malloc(sizeof(char *) * n);
 	sem_arr[0] = sem_open("forks", O_CREAT, S_IXUSR, n);
 	sem_arr[1] = sem_open("state", O_CREAT, S_IXUSR, n);
+	i = 0;
+	while (i < n)
+	{
+		char *str = ft_itoa(i);
+		sem_death[i] = sem_open(str, O_CREAT, S_IXUSR, n);
+		name_arr[i] = str;
+		i ++;
+	}
 	info_init_new(sh_info);
 	i = 0;
 	while (i < n)
@@ -98,16 +139,18 @@ int	main(int argc, char *argv[])
 			waitpid(pids[i ++], &status, 0);
 		//printf("I am your father\n");
 		//printf("%d, errno: %d\n", sem_arr[0], errno);
-		free_sem(n, sem_arr);
+		free_sem(n, name_arr, sem_arr, sem_death);
 		free(sh_info);
 		free(pids);
+		/*printf("%d\n", getpid());
+		while (1);*/
 		return (1);
 	}
 	else
 	{
 		//printf("I am a child\n");
 		aroutine(i, sem_arr, sh_info);
-		free_sem(n, sem_arr);
+		free_sem(n, name_arr, sem_arr, sem_death);
 		free(sh_info);
 		free(pids);
 		return (1);
