@@ -34,6 +34,7 @@ t_info	*info_init(int argc, char *argv[])
 	t_info			*sh_info;
 	const int		num = atoi(argv[1]);
 	struct timeval	mytime;
+	char	*str;
 
 	i = 0;
 	gettimeofday(&mytime, NULL);
@@ -47,22 +48,40 @@ t_info	*info_init(int argc, char *argv[])
 	sh_info->fork = sem_open("forks", O_CREAT, S_IXUSR, num);
 	sh_info->deadlock_check = sem_open("deadlock", O_CREAT, S_IXUSR, (num / 2));
 	sh_info->end_death = sem_open("end_death", O_CREAT, S_IXUSR, 0);
-	sh_info->end_eat = sem_open("end_eat", O_CREAT, S_IXUSR, num);
+	sh_info->end_eat = (sem_t **)malloc(sizeof(sem_t *) * num);
+	while (i < num)
+	{
+		str = ft_itoa(i + 1);
+		sh_info->end_eat[i] = sem_open(str, O_CREAT, S_IXUSR, 0);
+		free(str);
+		i ++;
+	}
 	pthread_mutex_init(&(sh_info->mutex_c), 0);
 	return (sh_info);
 }
 
 void	free_all(t_philo *philo)
 {
+	int	i;
+	char	*str;
+
+	i = 0;
 	sem_unlink("forks");
 	sem_close(philo->sh_info->fork);
 	sem_unlink("deadlock");
 	sem_close(philo->sh_info->deadlock_check);
 	sem_unlink("end_death");
 	sem_close(philo->sh_info->end_death);
-	sem_unlink("end_eat");
-	sem_close(philo->sh_info->end_eat);
+	while (i < philo->sh_info->philo_num)
+	{
+		str = ft_itoa(i + 1);
+		sem_unlink(str);
+		sem_close(philo->sh_info->end_eat[i]);
+		free(str);
+		i ++;
+	}
 	pthread_mutex_destroy(&(philo->sh_info->mutex_c));
+	free(philo->sh_info->end_eat);
 	free(philo->sh_info);
 	free(philo);
 }

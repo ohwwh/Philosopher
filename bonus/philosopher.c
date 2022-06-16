@@ -78,7 +78,9 @@ int	main(int argc, char *argv[])
 	if (pid > 0)
 	{
 		i = 0;
-		sem_wait(philo->sh_info->end_death);
+		while (i < philo->sh_info->philo_num)
+			sem_wait(philo->sh_info->end_eat[i ++]);
+		i = 0;
 		while (i < philo->sh_info->philo_num)
 			kill(pids[i ++], SIGUSR1);
 		free_all(philo);

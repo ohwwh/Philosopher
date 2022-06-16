@@ -19,7 +19,7 @@ static void	end_philo(t_philo *philo)
 {
 	if (philo->state == philo->sh_info->must_eat)
 	{
-		sem_post(philo->sh_info->end_eat);
+		sem_post(philo);
 		pthread_mutex_unlock(&(philo->sh_info->mutex_c));
 		exit(1);
 	}
@@ -27,17 +27,23 @@ static void	end_philo(t_philo *philo)
 
 static void	check_death(t_philo *philo)
 {
+	int	i;
 	struct timeval	mytime;
 	long			current_time;
 	const int		time_to_die = philo->sh_info->time_to_die;
 
+	i = 0;
 	gettimeofday(&mytime, 0);
 	current_time = stamp(mytime.tv_sec, mytime.tv_usec, philo);
 	if (current_time - philo->former > time_to_die)
 	{
 		printf("at %ld %dth died\n", current_time, philo->th_num);
 		//printf(" - RIP: last eating: %ld\n", philo[j].former);
-		sem_post(philo->sh_info->end_death);
+		while (i < philo->sh_info->end_eat)
+		{
+			sem_post(philo->sh_info->end_eat);
+			i ++;
+		}
 		pthread_mutex_unlock(&(philo->sh_info->mutex_c));
 		exit(1);
 	}
