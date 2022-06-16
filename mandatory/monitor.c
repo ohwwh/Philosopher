@@ -38,9 +38,11 @@ static void	check_death(int j, t_philo *philo)
 	{
 		if (current_time - philo[j].former > time_to_die)
 		{
-			printf("at %ld %dth died", current_time, j + 1);
+			pthread_mutex_lock(&(philo->sh_info->mutex_c));
+			printf("at %ld %dth died\n", current_time, j + 1);
 			//printf(" - RIP: last eating: %ld\n", philo[j].former);
 			philo->sh_info->death = 1;
+			pthread_mutex_unlock(&(philo->sh_info->mutex_c));
 		}
 	}
 }

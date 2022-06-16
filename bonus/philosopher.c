@@ -13,6 +13,8 @@ void	free_sem(int n, sem_t **sem_arr)
 {
 	sem_unlink("forks");
 	sem_close(sem_arr[0]);
+	sem_unlink("state");
+	sem_close(sem_arr[1]);
 	free(sem_arr);
 }
 
@@ -20,25 +22,31 @@ void	aroutine(int n, sem_t **sem_arr, t_info *sh_info)
 {
 	int	state;
 	int	i;
+	long	former;
 	struct timeval mytime;
 
+	former = 0;
 	state = 0;
-	while (state < 1)
+	while (state < 10)
 	{
 		if (n % 2 && state == 0)
-			usleep(200 * 1000);
+			ft_msleep(200);
+		sem_wait(sem_arr[1]);
 		sem_wait(sem_arr[0]);
 		sem_wait(sem_arr[0]);
 		gettimeofday(&mytime, 0);
 		printf("at %ld %d grabs the fork\n", stamp(mytime.tv_sec, mytime.tv_usec, sh_info), n);
-		printf("at %ld %d start eating\n", stamp(mytime.tv_sec, mytime.tv_usec, sh_info), n);
-		usleep(200 * 1000);
+		printf("at %ld %d start eating, waiting time: %ld\n", stamp(mytime.tv_sec, mytime.tv_usec, sh_info), n, 
+		stamp(mytime.tv_sec, mytime.tv_usec, sh_info) - former);
+		former = stamp(mytime.tv_sec, mytime.tv_usec, sh_info);
+		ft_msleep(200);
 		gettimeofday(&mytime, 0);
 		printf("at %ld %d finish eating\n", stamp(mytime.tv_sec, mytime.tv_usec, sh_info), n);
 		sem_post(sem_arr[0]);
 		sem_post(sem_arr[0]);
+		sem_post(sem_arr[1]);
 		printf("at %ld %d start sleeping\n", stamp(mytime.tv_sec, mytime.tv_usec, sh_info), n);
-		usleep(200 * 1000);
+		ft_msleep(200);
 		gettimeofday(&mytime, 0);
 		printf("at %ld %d start thinking\n", stamp(mytime.tv_sec, mytime.tv_usec, sh_info), n);
 		usleep(200);
@@ -61,14 +69,15 @@ int	main(int argc, char *argv[])
 
 
 	pid = 1;
-	n = 4;
+	n = 190;
 	/*if (argc != 6 && argc != 5)
 		return (printf("Arguments error!\n"));*/
 	i = 0;
-	sem_arr = (sem_t **)malloc(sizeof(sem_t *) * 1);
+	sem_arr = (sem_t **)malloc(sizeof(sem_t *) * 2);
 	sh_info = (t_info *)malloc(sizeof(t_info));
 	pids = (int *)malloc(sizeof(int) * n);
 	sem_arr[0] = sem_open("forks", O_CREAT, S_IXUSR, n);
+	sem_arr[1] = sem_open("state", O_CREAT, S_IXUSR, n);
 	info_init_new(sh_info);
 	i = 0;
 	while (i < n)
@@ -84,10 +93,9 @@ int	main(int argc, char *argv[])
 	}
 	if (pid > 0)
 	{
-		waitpid(pids[0], &status, 0);
-		waitpid(pids[1], &status, 0);
-		waitpid(pids[2], &status, 0);
-		waitpid(pids[3], &status, 0);
+		i = 0;
+		while (i < n)
+			waitpid(pids[i ++], &status, 0);
 		//printf("I am your father\n");
 		//printf("%d, errno: %d\n", sem_arr[0], errno);
 		free_sem(n, sem_arr);

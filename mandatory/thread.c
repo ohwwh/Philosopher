@@ -2,10 +2,13 @@
 
 static int  iter_condition(t_philo *philo)
 {
+    int ret;
+
+    ret = philo->state < philo->sh_info->must_eat && !philo->sh_info->death;
     if (philo->sh_info->must_eat == -1)
-        return (1);
+        return (!philo->sh_info->death);
     else
-        return (philo->state < philo->sh_info->must_eat);
+        return (ret);
 }
 
 static void    start_simulation(int number, t_philo *philo)
