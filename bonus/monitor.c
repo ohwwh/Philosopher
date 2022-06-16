@@ -15,18 +15,18 @@ static int	end_simulation(t_philo *philo)
 	return (ret);
 }
 
-static void	end_philo(int j, t_philo *philo)
+static void	end_philo(t_philo *philo)
 {
-	if (philo[j].end == 1)
+	if (philo->end == 1)
 	{
 		pthread_mutex_lock(&(philo->sh_info->mutex_c));
 		philo->sh_info->end += 1;
 		pthread_mutex_unlock(&(philo->sh_info->mutex_c));
-		philo[j].end += 1;
+		philo->end += 1;
 	}
 }
 
-static void	check_death(int j, t_philo *philo)
+static void	check_death(t_philo *philo)
 {
 	struct timeval	mytime;
 	long			current_time;
@@ -34,34 +34,28 @@ static void	check_death(int j, t_philo *philo)
 
 	gettimeofday(&mytime, 0);
 	current_time = stamp(mytime.tv_sec, mytime.tv_usec, philo);
-	if (philo[j].end < 1 && philo->sh_info->death != 1)
+	if (philo->end < 1 && philo->sh_info->death != 1)
 	{
-		if (current_time - philo[j].former > time_to_die)
+		if (current_time - philo->former > time_to_die)
 		{
-			printf("at %ld %dth died", current_time, j + 1);
+			printf("at %ld %dth died", current_time, philo->th_num);
 			//printf(" - RIP: last eating: %ld\n", philo[j].former);
 			philo->sh_info->death = 1;
 		}
 	}
 }
 
-void	monitoring(t_philo *philo, int n)
+void	*monitoring_routine(void *data)
 {
-	int				j;
+	t_philo         *philo;
 
+	philo = (t_philo *)data;
 	while (1)
 	{
-		j = 0;
-		while (j < n)
-		{
-			pthread_mutex_lock(&(philo->sh_info->mutex_m[j]));
-			end_philo(j, philo);
-			check_death(j, philo);
-			pthread_mutex_unlock(&(philo->sh_info->mutex_m[j]));
-			j ++;
-		}
-		if (end_simulation(philo))
-			break ;
-		usleep(500);
+		pthread_mutex_lock(&(philo->sh_info->mutex_c));
+		//end_philo(philo);
+		check_death(philo);
+		pthread_mutex_unlock(&(philo->sh_info->mutex_c));
 	}
+	return (0);
 }
