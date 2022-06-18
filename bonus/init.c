@@ -13,6 +13,7 @@ t_philo	*philo_init(int argc, char *argv[])
 	philo->state = 0;
 	philo->end = 0;
 	philo->former = 0;
+	printf("debug\n");
 	return (philo);
 }
 
@@ -39,6 +40,7 @@ t_info	*info_init(int argc, char *argv[])
 	i = 0;
 	gettimeofday(&mytime, NULL);
 	sh_info = (t_info *)malloc(sizeof(t_info));
+	sh_info->pids = (int *)malloc(sizeof(int) * num);
 	main_arg_init(num, argc, argv, sh_info);
 	sh_info->std_sec = mytime.tv_sec;
 	sh_info->std_usec = mytime.tv_usec;
@@ -63,6 +65,8 @@ t_info	*info_init(int argc, char *argv[])
 		sh_info->sim_start[i] = sem_open(str, O_CREAT | O_EXCL, S_IXUSR, 0);
 		sem_unlink(str);
 		free(str);
+		//printf("/%d/, %d, %d, errno: %d\n", i, sh_info->end_eat[i], sh_info->sim_start[i], errno);
+		//printf("debug: %d\n", i);
 		i ++;
 	}
 	pthread_mutex_init(&(sh_info->mutex_c), 0);
@@ -90,6 +94,8 @@ void	free_all(t_philo *philo)
 	}
 	pthread_mutex_destroy(&(philo->sh_info->mutex_c));
 	free(philo->sh_info->end_eat);
+	free(philo->sh_info->sim_start);
+	free(philo->sh_info->pids);
 	free(philo->sh_info);
 	free(philo);
 }

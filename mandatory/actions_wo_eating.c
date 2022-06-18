@@ -23,7 +23,6 @@ int	picking(int n, t_philo *philo)
 void	sleeping(t_philo *philo)
 {
 	ft_msleep(philo->sh_info->time_to_sleep);
-	//usleep(200 * 1000);
 }
 
 void	thinking(void)

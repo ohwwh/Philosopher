@@ -24,6 +24,7 @@ typedef struct s_info
 	int	cnt;
 	int	end;
 	int start;
+	int	*pids;
 	pthread_mutex_t mutex_c;
 	sem_t *fork;
 	sem_t *deadlock_check;
@@ -38,13 +39,14 @@ typedef struct s_philo
 	int state;
 	int	end;
 	long former;
+	pthread_t thread_t;
 	t_info *sh_info;
 }t_philo; //철학자 개개인의 속성들
 
-void	*monitoring_routine(void *data);
-void    *routine(t_philo *philo);
+void	*monitoring(void *data);
+void	routine(int num, t_philo *philo);
 int 	picking(int n, t_philo *philo);
-int 	eating(int n, t_philo *philo);
+void 	eating(int n, t_philo *philo);
 void    sleeping(t_philo *philo);
 void	thinking(void);
 void    ft_msleep(int time);
