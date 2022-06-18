@@ -42,7 +42,7 @@ t_info	*info_init(int argc, char *argv[])
 	main_arg_init(num, argc, argv, sh_info);
 	sh_info->std_sec = mytime.tv_sec;
 	sh_info->std_usec = mytime.tv_usec;
-	sh_info->death = 0;
+	sh_info->start = 0;
 	sh_info->end = 0;
 	sh_info->cnt = 0;
 	sh_info->fork = sem_open("forks", O_CREAT, S_IXUSR, num);
@@ -50,10 +50,15 @@ t_info	*info_init(int argc, char *argv[])
 	sh_info->deadlock_check = sem_open("deadlock", O_CREAT, S_IXUSR, (num / 2));
 	sem_unlink("deadlock");
 	sh_info->end_eat = (sem_t **)malloc(sizeof(sem_t *) * num);
+	sh_info->sim_start = (sem_t **)malloc(sizeof(sem_t *) * num);
 	while (i < num)
 	{
 		str = ft_itoa(i + 1);
 		sh_info->end_eat[i] = sem_open(str, O_CREAT | O_EXCL, S_IXUSR, 0);
+		sem_unlink(str);
+		free(str);
+		str = ft_itoa(i + 201);
+		sh_info->sim_start[i] = sem_open(str, O_CREAT | O_EXCL, S_IXUSR, 0);
 		sem_unlink(str);
 		free(str);
 		i ++;
@@ -74,6 +79,9 @@ void	free_all(t_philo *philo)
 	{
 		str = ft_itoa(i + 1);
 		sem_close(philo->sh_info->end_eat[i]);
+		free(str);
+		str = ft_itoa(i + 201);
+		sem_close(philo->sh_info->sim_start[i]);
 		free(str);
 		i ++;
 	}

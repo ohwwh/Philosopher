@@ -13,6 +13,8 @@ static int  iter_condition(t_philo *philo)
 
 static void    start_simulation(int number, t_philo *philo)
 {
+    struct timeval  mytime;
+
     while (1)
     {
         pthread_mutex_lock(&(philo->sh_info->mutex_c));
@@ -20,6 +22,8 @@ static void    start_simulation(int number, t_philo *philo)
             philo->sh_info->cnt ++;
         if (philo->sh_info->cnt == number)
         {
+            gettimeofday(&mytime, 0);
+            philo->former = stamp(mytime.tv_sec, mytime.tv_usec, philo);
             pthread_mutex_unlock(&(philo->sh_info->mutex_c));
             break ;
         }
@@ -59,10 +63,6 @@ void    *routine(void *data)
     n = philo->th_num + 1;
     number = philo->sh_info->philo_num; 
     start_simulation(number, philo);
-    gettimeofday(&mytime, 0);
-    pthread_mutex_lock(&(philo->sh_info->mutex_m[n - 1]));
-    philo->former = stamp(mytime.tv_sec, mytime.tv_usec, philo);
-    pthread_mutex_unlock(&(philo->sh_info->mutex_m[n - 1]));
     simulation(n, number, philo);
     philo->end = 1;
     pause();

@@ -17,9 +17,11 @@ static int	end_simulation(t_philo *philo)
 
 static void	end_philo(t_philo *philo)
 {
+	int	ret;
+
 	if (philo->state == philo->sh_info->must_eat)
 	{
-		sem_post(philo->sh_info->end_eat[philo->th_num - 1]);
+		ret = sem_post(philo->sh_info->end_eat[philo->th_num - 1]);
 		pthread_mutex_unlock(&(philo->sh_info->mutex_c));
 		exit(1);
 	}
@@ -52,11 +54,24 @@ void	*monitoring_routine(void *data)
 	t_philo         *philo;
 
 	philo = (t_philo *)data;
+	
+	/*while (1)
+	{
+		pthread_mutex_lock(&(philo->sh_info->mutex_c));
+		if (philo->sh_info->start == 1)
+		{
+			pthread_mutex_unlock(&(philo->sh_info->mutex_c));
+			break;
+		}
+		pthread_mutex_unlock(&(philo->sh_info->mutex_c));
+		usleep(2000);
+	}*/
+
 	while (1)
 	{
 		pthread_mutex_lock(&(philo->sh_info->mutex_c));
 		end_philo(philo);
-		check_death(philo);
+		//check_death(philo);
 		pthread_mutex_unlock(&(philo->sh_info->mutex_c));
 	}
 	usleep(500);

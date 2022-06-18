@@ -14,9 +14,11 @@ static int	start_eating(int n, t_philo *philo)
 		return (1);	
 	}
 	else
-		printf("at %ld %dth start eating\n", stamp(t.tv_sec, t.tv_usec, philo), n);
+	{
+		printf("at %ld %dth start eating", stamp(t.tv_sec, t.tv_usec, philo), n);
+		printf(" waiting time: %ld, last eating: %ld\n", wait, philo->former);
+	}
 	pthread_mutex_unlock(&(philo->sh_info->mutex_c));
-	//printf(" waiting time: %ld, last eating: %ld\n", wait, philo->former);
 	pthread_mutex_lock(&(philo->sh_info->mutex_m[n - 1]));
 	philo->former = stamp(t.tv_sec, t.tv_usec, philo);
 	pthread_mutex_unlock(&(philo->sh_info->mutex_m[n - 1]));

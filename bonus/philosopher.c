@@ -18,38 +18,46 @@ void	aroutine(int n, t_philo *philo)
 	struct timeval mytime;
 
 	i = 0;
-	//sem_post(philo->sh_info->end_eat[philo->th_num - 1]);
-	/*while (i < philo->sh_info->philo_num)
+	while (i < philo->sh_info->philo_num)
 	{
-		if (i != philo->th_num - 1)
-			sem_wait(philo->sh_info->end_eat[i]);
+		sem_post(philo->sh_info->sim_start[philo->th_num - 1]);
 		i ++;
-	}*/
+	}
+	i = 0;
+	while (i < philo->sh_info->philo_num)
+		sem_wait(philo->sh_info->sim_start[i ++]);
 	gettimeofday(&mytime, 0);
 	philo->former = stamp(mytime.tv_sec, mytime.tv_usec, philo);
-	while (1)
+	/*pthread_mutex_lock(&(philo->sh_info->mutex_c));
+	philo->sh_info->start = 1;
+	pthread_mutex_unlock(&(philo->sh_info->mutex_c));*/
+	while (philo->state < 10)
 	{
 		if (n % 2 && philo->state == 0)
-			ft_msleep(200);
+			ft_msleep(philo->sh_info->time_to_eat);
 		sem_wait(philo->sh_info->deadlock_check);
 		sem_wait(philo->sh_info->fork);
 		sem_wait(philo->sh_info->fork);
 		gettimeofday(&mytime, 0);
-		printf("at %ld %d grabs the fork\n", stamp(mytime.tv_sec, mytime.tv_usec, philo), n);
-		printf("at %ld %d start eating, waiting time: %ld\n", stamp(mytime.tv_sec, mytime.tv_usec, philo), n, 
-		stamp(mytime.tv_sec, mytime.tv_usec, philo) - philo->former);
+		//ㅁㅔ시지 섞임 방지용 세마포어도 있어야 함 ㅡㅡ
+		//printf("at %ld %d grabs the fork\n", stamp(mytime.tv_sec, mytime.tv_usec, philo), n);
+		printf("at %ld %d start eating, waiting time: %ld, last eating: %d\n"
+		,stamp(mytime.tv_sec, mytime.tv_usec, philo), n, 
+		stamp(mytime.tv_sec, mytime.tv_usec, philo) - philo->former, philo->former);
+		//printf("at %ld %d start eating\n", stamp(mytime.tv_sec, mytime.tv_usec, philo), n);
 		philo->former = stamp(mytime.tv_sec, mytime.tv_usec, philo);
 		ft_msleep(philo->sh_info->time_to_eat);
 		gettimeofday(&mytime, 0);
 		philo->state ++;
-		printf("at %ld %d finish eating     [%d]\n", stamp(mytime.tv_sec, mytime.tv_usec, philo), n, philo->state);
+		//printf("at %ld %d finish eating     [%d]\n", stamp(mytime.tv_sec, mytime.tv_usec, philo), n, philo->state);
+		//printf("at %ld %d finish eating\n", stamp(mytime.tv_sec, mytime.tv_usec, philo), n);
 		sem_post(philo->sh_info->fork);
 		sem_post(philo->sh_info->fork);
 		sem_post(philo->sh_info->deadlock_check);
-		//printf("at %ld %d start sleeping\n", stamp(mytime.tv_sec, mytime.tv_usec, sh_info), n);
+		//printf("at %ld %d start sleeping\n", stamp(mytime.tv_sec, mytime.tv_usec, philo), n);
 		ft_msleep(philo->sh_info->time_to_sleep);
 		gettimeofday(&mytime, 0);
-		//printf("at %ld %d start thinking\n", stamp(mytime.tv_sec, mytime.tv_usec, sh_info), n);
+		//printf("at %ld %d start thinking\n", stamp(mytime.tv_sec, mytime.tv_usec, philo), n);
 		usleep(200);
 	}
 }
@@ -60,6 +68,7 @@ int	main(int argc, char *argv[])
 	int		pid;
 	int		status;
 	int		n;
+	int		ret;
 	int		*proc_arr;
 	sem_t **sem_arr; // 포크 + 데드락 방지 세마포어 // 죽음 측정용 세마포어
 	t_philo	*philo;
@@ -88,8 +97,11 @@ int	main(int argc, char *argv[])
 	if (pid > 0)
 	{
 		i = 0;
+
+		//while(1);
+
 		while (i < philo->sh_info->philo_num)
-			sem_wait(philo->sh_info->end_eat[i ++]);
+			ret = sem_wait(philo->sh_info->end_eat[i ++]);
 		i = 0;
 		while (i < philo->sh_info->philo_num)
 			kill(pids[i ++], SIGUSR1);
