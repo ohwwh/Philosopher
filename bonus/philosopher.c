@@ -28,9 +28,9 @@ void	aroutine(int n, t_philo *philo)
 		sem_wait(philo->sh_info->sim_start[i ++]);
 	gettimeofday(&mytime, 0);
 	philo->former = stamp(mytime.tv_sec, mytime.tv_usec, philo);
-	/*pthread_mutex_lock(&(philo->sh_info->mutex_c));
+	pthread_mutex_lock(&(philo->sh_info->mutex_c));
 	philo->sh_info->start = 1;
-	pthread_mutex_unlock(&(philo->sh_info->mutex_c));*/
+	pthread_mutex_unlock(&(philo->sh_info->mutex_c));
 	while (philo->state < 10)
 	{
 		if (n % 2 && philo->state == 0)
@@ -41,11 +41,15 @@ void	aroutine(int n, t_philo *philo)
 		gettimeofday(&mytime, 0);
 		//ㅁㅔ시지 섞임 방지용 세마포어도 있어야 함 ㅡㅡ
 		//printf("at %ld %d grabs the fork\n", stamp(mytime.tv_sec, mytime.tv_usec, philo), n);
+		sem_wait(philo->sh_info->print);
 		printf("at %ld %d start eating, waiting time: %ld, last eating: %d\n"
 		,stamp(mytime.tv_sec, mytime.tv_usec, philo), n, 
 		stamp(mytime.tv_sec, mytime.tv_usec, philo) - philo->former, philo->former);
+		sem_post(philo->sh_info->print);
 		//printf("at %ld %d start eating\n", stamp(mytime.tv_sec, mytime.tv_usec, philo), n);
+		pthread_mutex_lock(&(philo->sh_info->mutex_c));
 		philo->former = stamp(mytime.tv_sec, mytime.tv_usec, philo);
+		pthread_mutex_unlock(&(philo->sh_info->mutex_c));
 		ft_msleep(philo->sh_info->time_to_eat);
 		gettimeofday(&mytime, 0);
 		philo->state ++;

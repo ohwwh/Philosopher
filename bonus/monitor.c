@@ -55,7 +55,7 @@ void	*monitoring_routine(void *data)
 
 	philo = (t_philo *)data;
 	
-	/*while (1)
+	while (1)
 	{
 		pthread_mutex_lock(&(philo->sh_info->mutex_c));
 		if (philo->sh_info->start == 1)
@@ -64,16 +64,15 @@ void	*monitoring_routine(void *data)
 			break;
 		}
 		pthread_mutex_unlock(&(philo->sh_info->mutex_c));
-		usleep(2000);
-	}*/
+	}
 
 	while (1)
 	{
 		pthread_mutex_lock(&(philo->sh_info->mutex_c));
 		end_philo(philo);
-		//check_death(philo);
+		check_death(philo);
 		pthread_mutex_unlock(&(philo->sh_info->mutex_c));
+		usleep(500);
 	}
-	usleep(500);
 	return (0);
 }

@@ -48,7 +48,9 @@ t_info	*info_init(int argc, char *argv[])
 	sh_info->fork = sem_open("forks", O_CREAT, S_IXUSR, num);
 	sem_unlink("forks");
 	sh_info->deadlock_check = sem_open("deadlock", O_CREAT, S_IXUSR, (num / 2));
+	sh_info->print = sem_open("print", O_CREAT, S_IXUSR, 1);
 	sem_unlink("deadlock");
+	sem_unlink("print");
 	sh_info->end_eat = (sem_t **)malloc(sizeof(sem_t *) * num);
 	sh_info->sim_start = (sem_t **)malloc(sizeof(sem_t *) * num);
 	while (i < num)
@@ -75,6 +77,7 @@ void	free_all(t_philo *philo)
 	i = 0;
 	sem_close(philo->sh_info->fork);
 	sem_close(philo->sh_info->deadlock_check);
+	sem_close(philo->sh_info->print);
 	while (i < philo->sh_info->philo_num)
 	{
 		str = ft_itoa(i + 1);
