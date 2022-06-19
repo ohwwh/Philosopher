@@ -69,5 +69,5 @@ void	free_all(t_philo *philo)
 	free(philo->sh_info->mutex_s);
 	free(philo->sh_info->mutex_m);
 	free(philo->sh_info);
-	free(philo);
+	free(philo); // 뮤텍스 디스트로이까지 여기다 넣어버리면 안될까?
 }

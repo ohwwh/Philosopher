@@ -36,19 +36,36 @@ static void	check_death(int j, t_philo *philo)
 	current_time = stamp(mytime.tv_sec, mytime.tv_usec, philo);
 	if (philo[j].end < 1 && philo->sh_info->death != 1)
 	{
-		if (current_time - philo[j].former > time_to_die)
+		if (current_time - philo[j].former >= time_to_die)
 		{
-			printf("at %ld %dth died", current_time, j + 1);
+			pthread_mutex_lock(&(philo->sh_info->mutex_c));
+			printf("at %ld %dth died\n", current_time, j + 1);
 			//printf(" - RIP: last eating: %ld\n", philo[j].former);
 			philo->sh_info->death = 1;
+			pthread_mutex_unlock(&(philo->sh_info->mutex_c));
 		}
+	}
+}
+
+static void	start_monitoring(t_philo *philo)
+{
+	while (1)
+	{
+		pthread_mutex_lock(&(philo->sh_info->mutex_c));
+		if (philo->sh_info->cnt == philo->sh_info->philo_num)
+		{
+			pthread_mutex_unlock(&(philo->sh_info->mutex_c));
+			break ;
+		}
+		pthread_mutex_unlock(&(philo->sh_info->mutex_c));
 	}
 }
 
 void	monitoring(t_philo *philo, int n)
 {
-	int				j;
+	int	j;
 
+	start_monitoring(philo);
 	while (1)
 	{
 		j = 0;
@@ -62,6 +79,5 @@ void	monitoring(t_philo *philo, int n)
 		}
 		if (end_simulation(philo))
 			break ;
-		usleep(500);
 	}
 }

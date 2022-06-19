@@ -32,7 +32,7 @@ typedef struct s_philo
 	int state;
 	int	end;
 	long former;
-	pthread_t thread_t;
+	pthread_t thr;
 	t_info *sh_info;
 }t_philo; //철학자 개개인의 속성들
 
@@ -41,8 +41,8 @@ void    monitoring(t_philo  *philo, int n);
 void    *routine(void *data);
 int 	picking(int n, t_philo *philo);
 int 	eating(int n, t_philo *philo);
-void    sleeping(t_philo *philo);
-void	thinking(void);
+int		sleeping(int n, t_philo *philo);
+int		thinking(int n, t_philo *philo);
 void    ft_msleep(int time);
 void    fork_mutex_lock(int n, t_philo *philo);
 void    fork_mutex_unlock(int n, t_philo *philo);

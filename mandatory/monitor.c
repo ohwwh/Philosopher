@@ -47,20 +47,25 @@ static void	check_death(int j, t_philo *philo)
 	}
 }
 
-void	monitoring(t_philo *philo, int n)
+static void	start_monitoring(t_philo *philo)
 {
-	int	j;
-
 	while (1)
 	{
 		pthread_mutex_lock(&(philo->sh_info->mutex_c));
 		if (philo->sh_info->cnt == philo->sh_info->philo_num)
-        {
-            pthread_mutex_unlock(&(philo->sh_info->mutex_c));
-            break ;
-        }
+		{
+			pthread_mutex_unlock(&(philo->sh_info->mutex_c));
+			break ;
+		}
 		pthread_mutex_unlock(&(philo->sh_info->mutex_c));
 	}
+}
+
+void	monitoring(t_philo *philo, int n)
+{
+	int	j;
+
+	start_monitoring(philo);
 	while (1)
 	{
 		j = 0;
@@ -74,6 +79,5 @@ void	monitoring(t_philo *philo, int n)
 		}
 		if (end_simulation(philo))
 			break ;
-		usleep(500);
 	}
 }

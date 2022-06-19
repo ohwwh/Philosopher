@@ -30,8 +30,8 @@ static void	simulation(int n, t_philo *philo)
 		fork_sem_lock(n, philo);
 		eating(n, philo);
 		fork_sem_unlock(philo);
-		sleeping(n, philo);
-		thinking(n, philo);
+		sleeping(philo);
+		thinking();
 	}
 }
 
