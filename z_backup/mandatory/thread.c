@@ -58,8 +58,10 @@ static void	simulation(int n, int number, t_philo *philo)
 			break ;
 		}
 		fork_mutex_unlock(n, philo);
-		sleeping(philo);
-		thinking();
+		if (sleeping(n, philo))
+			break ;
+		if (thinking(n, philo))
+			break ;
 	}
 }
 

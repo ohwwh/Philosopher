@@ -16,14 +16,30 @@ void	fork_sem_unlock(t_philo *philo)
 	sem_post(philo->sh_info->deadlock_check);
 }
 
-void	sleeping(t_philo *philo)
+void	sleeping(int n, t_philo *philo)
 {
-	//printf("at %ld %d start sleeping\n", stamp(mytime.tv_sec, mytime.tv_usec, philo), n);
+	struct timeval	t;
+	long			current;
+
+	sem_wait(philo->sh_info->print);
+	gettimeofday(&t, 0);
+	current = stamp(t.tv_sec, t.tv_usec, philo);
+	printf("at %ld %dth start sleeping", current, n);
+	printf("                      [%d]\n", philo->state);
+	sem_post(philo->sh_info->print);
 	ft_msleep(philo->sh_info->time_to_sleep);
 }
 
-void	thinking(void)
+void	thinking(int n, t_philo *philo)
 {
-	//printf("at %ld %d start thinking\n", stamp(mytime.tv_sec, mytime.tv_usec, philo), n);
+	struct timeval	t;
+	long			current;
+	
+	sem_wait(philo->sh_info->print);
+	gettimeofday(&t, 0);
+	current = stamp(t.tv_sec, t.tv_usec, philo);
+	printf("at %ld %dth start thinking", current, n);
+	printf("                      [%d]\n", philo->state);
+	sem_post(philo->sh_info->print);
 	usleep(500);
 }

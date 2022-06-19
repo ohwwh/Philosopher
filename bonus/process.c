@@ -23,8 +23,6 @@ static void	start_simulation(int n, t_philo *philo)
 
 static void	simulation(int n, t_philo *philo)
 {
-	struct timeval	mytime;
-
 	while (1)
 	{
 		fork_sem_lock(n, philo);
@@ -37,8 +35,6 @@ static void	simulation(int n, t_philo *philo)
 
 void	routine(int n, t_philo *philo)
 {
-	int	i;
-
 	start_simulation(n, philo);
 	simulation(n, philo);
 }

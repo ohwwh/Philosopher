@@ -32,12 +32,48 @@ void	fork_mutex_unlock(int n, t_philo *philo)
 		pthread_mutex_unlock(&(philo->sh_info->mutex_s[RIGHT]));
 }
 
-void	sleeping(t_philo *philo)
+int	sleeping(int n, t_philo *philo)
 {
-	ft_msleep(philo->sh_info->time_to_sleep);
+	struct timeval	t;
+	long			current;
+
+	pthread_mutex_lock(&(philo->sh_info->mutex_c));
+	if (philo->sh_info->death == 1)
+	{
+		pthread_mutex_unlock(&(philo->sh_info->mutex_c));
+		return (1);
+	}
+	else
+	{
+		gettimeofday(&t, 0);
+		current = stamp(t.tv_sec, t.tv_usec, philo);
+		printf("at %ld %dth start sleeping", current, n);
+		printf("                      [%d]\n", philo->state);
+		pthread_mutex_unlock(&(philo->sh_info->mutex_c));
+		ft_msleep(philo->sh_info->time_to_sleep);
+	}
+	return (0);
 }
 
-void	thinking(void)
+int	thinking(int n, t_philo *philo)
 {
-	usleep(500);
+	struct timeval	t;
+	long			current;
+
+	pthread_mutex_lock(&(philo->sh_info->mutex_c));
+	if (philo->sh_info->death == 1)
+	{
+		pthread_mutex_unlock(&(philo->sh_info->mutex_c));
+		return (1);
+	}
+	else
+	{
+		gettimeofday(&t, 0);
+		current = stamp(t.tv_sec, t.tv_usec, philo);
+		printf("at %ld %dth start thinking", current, n);
+		printf("                      [%d]\n", philo->state);
+		pthread_mutex_unlock(&(philo->sh_info->mutex_c));
+		usleep(500);
+	}
+	return (0);
 }

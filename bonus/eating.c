@@ -12,7 +12,7 @@ static void	start_eating(int n, t_philo *philo)
 	wait = current - philo->former;
 	printf("at %ld %dth has grab the fork\n", current, n);
 	printf("at %ld %dth start eating", current, n);
-	printf(", waiting time: %ld,     [%d]\n", wait, philo->state);
+	printf(", waiting time: %ld,    [%d]\n", wait, philo->state);
 	sem_post(philo->sh_info->print);
 	pthread_mutex_lock(&(philo->sh_info->mutex_c));
 	philo->former = stamp(mytime.tv_sec, mytime.tv_usec, philo);

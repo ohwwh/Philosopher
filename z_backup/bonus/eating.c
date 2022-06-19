@@ -10,9 +10,9 @@ static void	start_eating(int n, t_philo *philo)
 	gettimeofday(&mytime, 0);
 	current = stamp(mytime.tv_sec, mytime.tv_usec, philo);
 	wait = current - philo->former;
-	printf("at %ld %d grabs the fork\n", current, n);
-	printf("at %ld %d start eating", current, n);
-	printf(" waiting time: %ld, last eating: %ld\n", wait, philo->former);
+	printf("at %ld %dth has grab the fork\n", current, n);
+	printf("at %ld %dth start eating", current, n);
+	printf(", waiting time: %ld,    [%d]\n", wait, philo->state);
 	sem_post(philo->sh_info->print);
 	pthread_mutex_lock(&(philo->sh_info->mutex_c));
 	philo->former = stamp(mytime.tv_sec, mytime.tv_usec, philo);
@@ -28,8 +28,8 @@ static void	finish_eating(int n, t_philo *philo)
 	sem_wait(philo->sh_info->print);
 	gettimeofday(&mytime, 0);
 	current = stamp(mytime.tv_sec, mytime.tv_usec, philo);
-	printf("at %ld %d finish eating", current, n);
-	printf("     [%d]\n", philo->state);
+	printf("at %ld %dth finish eating", current, n);
+	printf("                       [%d]\n", philo->state);
 	sem_post(philo->sh_info->print);
 }
 

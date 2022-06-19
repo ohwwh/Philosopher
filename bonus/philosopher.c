@@ -28,7 +28,6 @@ int	child_process(int n, t_philo *philo)
 
 int	main(int argc, char *argv[])
 {
-	int		i;
 	int		pid;
 	int		n;
 	t_philo	*philo;
