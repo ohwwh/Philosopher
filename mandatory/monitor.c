@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   monitor.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: hoh <marvin@42.fr>                         +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/06/20 11:36:58 by hoh               #+#    #+#             */
+/*   Updated: 2022/06/20 11:37:00 by hoh              ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "philosopher.h"
 
 static int	end_simulation(t_philo *philo)
@@ -39,9 +51,8 @@ static void	check_death(int j, t_philo *philo)
 		if (current_time - philo[j].former >= time_to_die)
 		{
 			pthread_mutex_lock(&(philo->sh_info->mutex_c));
-			printf("at %ld %dth died\n", current_time, j + 1);
-			//printf(" - RIP: last eating: %ld\n", philo[j].former);
 			philo->sh_info->death = 1;
+			printf("at %ld %dth died\n", current_time, j + 1);
 			pthread_mutex_unlock(&(philo->sh_info->mutex_c));
 		}
 	}

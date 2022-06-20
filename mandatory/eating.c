@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   eating.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: hoh <marvin@42.fr>                         +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/06/20 11:36:53 by hoh               #+#    #+#             */
+/*   Updated: 2022/06/20 11:36:53 by hoh              ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "philosopher.h"
 
 static int	start_eating(int n, t_philo *philo)
@@ -33,15 +45,15 @@ static int	finish_eating(int n, t_philo *philo)
 	struct timeval	t;
 	long			current;
 
-	philo->state ++;
 	pthread_mutex_lock(&(philo->sh_info->mutex_c));
 	if (philo->sh_info->death == 1)
 	{
 		pthread_mutex_unlock(&(philo->sh_info->mutex_c));
-		return (1);	
+		return (1);
 	}
 	else
 	{
+		philo->state ++;
 		gettimeofday(&t, 0);
 		current = stamp(t.tv_sec, t.tv_usec, philo);
 		printf("at %ld %dth finish eating", current, n);

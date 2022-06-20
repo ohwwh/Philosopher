@@ -34,7 +34,7 @@ typedef struct s_philo
 	int state;
 	int	end;
 	long former;
-	pthread_t thread_t;
+	pthread_t thr;
 	t_info *sh_info;
 }t_philo; //철학자 개개인의 속성들
 

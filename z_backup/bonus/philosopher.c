@@ -13,17 +13,18 @@ int	parent_process(t_philo *philo)
 	free_all(philo);
 	/*printf("%d\n", getpid());
 	while (1);*/
-	return (1);
+	return (0);
 }
 
 int	child_process(int n, t_philo *philo)
 {
 	philo->th_num = n;
-	pthread_create(&(philo->thread_t), 0, monitoring, (void *)philo);
+	if (pthread_create(&(philo->thr), 0, monitoring, (void *)philo))
+		return (printf("thread create error!\n"));
 	routine(n, philo);
-	pthread_join(philo->thread_t, 0);
+	pthread_join(philo->thr, 0);
 	free_all(philo);
-	return (1);
+	return (0);
 }
 
 int	main(int argc, char *argv[])

@@ -13,18 +13,6 @@ static int	is_one(int number, t_philo *philo)
 	return (ret);
 }
 
-static int	iter_condition(t_philo *philo)
-{
-	int	ret;
-
-	ret = philo->state < philo->sh_info->must_eat;
-	ret = ret && !philo->sh_info->death;
-	if (philo->sh_info->must_eat == -1)
-		return (!philo->sh_info->death);
-	else
-		return (ret);
-}
-
 static void	start_simulation(int number, t_philo *philo)
 {
 	struct timeval	mytime;
@@ -47,7 +35,9 @@ static void	start_simulation(int number, t_philo *philo)
 
 static void	simulation(int n, int number, t_philo *philo)
 {
-	while (iter_condition(philo))
+	const int	must = philo->sh_info->must_eat;
+
+	while (!philo->sh_info->death && philo->state != must)
 	{
 		if (is_one(number, philo))
 			break ;
@@ -75,6 +65,5 @@ void	*routine(void *data)
 	start_simulation(number, philo);
 	simulation(philo->th_num + 1, number, philo);
 	philo->end = 1;
-	//pause();
 	return (0);
 }

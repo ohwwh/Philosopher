@@ -36,9 +36,10 @@ int	sleeping(int n, t_philo *philo)
 {
 	struct timeval	t;
 	long			current;
+	const int		must = philo->sh_info->must_eat;
 
 	pthread_mutex_lock(&(philo->sh_info->mutex_c));
-	if (philo->sh_info->death == 1)
+	if (philo->sh_info->death == 1 || philo->state == must)
 	{
 		pthread_mutex_unlock(&(philo->sh_info->mutex_c));
 		return (1);
@@ -59,9 +60,10 @@ int	thinking(int n, t_philo *philo)
 {
 	struct timeval	t;
 	long			current;
+	const int		must = philo->sh_info->must_eat;
 
 	pthread_mutex_lock(&(philo->sh_info->mutex_c));
-	if (philo->sh_info->death == 1)
+	if (philo->sh_info->death == 1 || philo->state == must)
 	{
 		pthread_mutex_unlock(&(philo->sh_info->mutex_c));
 		return (1);

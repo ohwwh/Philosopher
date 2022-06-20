@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   init.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: hoh <marvin@42.fr>                         +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/06/20 11:36:21 by hoh               #+#    #+#             */
+/*   Updated: 2022/06/20 11:36:22 by hoh              ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "philosopher.h"
 
 t_info	*info_init(int argc, char *argv[]);
@@ -78,23 +90,6 @@ t_info	*info_init(int argc, char *argv[])
 
 void	free_all(t_philo *philo)
 {
-	int		i;
-	char	*str;
-
-	i = 0;
-	sem_close(philo->sh_info->fork);
-	sem_close(philo->sh_info->deadlock_check);
-	sem_close(philo->sh_info->print);
-	while (i < philo->sh_info->philo_num)
-	{
-		str = ft_itoa(i + 1);
-		sem_close(philo->sh_info->end_eat[i]);
-		free(str);
-		str = ft_itoa(i + 201);
-		sem_close(philo->sh_info->sim_start[i]);
-		free(str);
-		i ++;
-	}
 	pthread_mutex_destroy(&(philo->sh_info->mutex_c));
 	free(philo->sh_info->end_eat);
 	free(philo->sh_info->sim_start);

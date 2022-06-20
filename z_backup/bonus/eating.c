@@ -24,7 +24,9 @@ static void	finish_eating(int n, t_philo *philo)
 	struct timeval	mytime;
 	long			current;
 
+	pthread_mutex_lock(&(philo->sh_info->mutex_c));
 	philo->state ++;
+	pthread_mutex_unlock(&(philo->sh_info->mutex_c));
 	sem_wait(philo->sh_info->print);
 	gettimeofday(&mytime, 0);
 	current = stamp(mytime.tv_sec, mytime.tv_usec, philo);

@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   monitor.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: hoh <marvin@42.fr>                         +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/06/20 11:36:26 by hoh               #+#    #+#             */
+/*   Updated: 2022/06/20 11:36:27 by hoh              ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "philosopher.h"
 
 static void	end_philo(t_philo *philo)
@@ -22,9 +34,8 @@ static void	check_death(t_philo *philo)
 	current_time = stamp(mytime.tv_sec, mytime.tv_usec, philo);
 	if (current_time - philo->former >= time_to_die)
 	{
-		printf("at %ld %dth died\n", current_time, philo->th_num);
-		//printf(" - RIP: last eating: %ld\n", philo[j].former);
 		sem_wait(philo->sh_info->print);
+		printf("at %ld %dth died\n", current_time, philo->th_num);
 		while (i < philo->sh_info->philo_num)
 			sem_post(philo->sh_info->end_eat[i ++]);
 		pthread_mutex_unlock(&(philo->sh_info->mutex_c));
@@ -32,11 +43,8 @@ static void	check_death(t_philo *philo)
 	}
 }
 
-void	*monitoring(void *data)
+static void	start_monitoring(t_philo *philo)
 {
-	t_philo	*philo;
-
-	philo = (t_philo *)data;
 	while (1)
 	{
 		pthread_mutex_lock(&(philo->sh_info->mutex_c));
@@ -47,6 +55,14 @@ void	*monitoring(void *data)
 		}
 		pthread_mutex_unlock(&(philo->sh_info->mutex_c));
 	}
+}
+
+void	*monitoring(void *data)
+{
+	t_philo	*philo;
+
+	philo = (t_philo *)data;
+	start_monitoring(philo);
 	while (1)
 	{
 		pthread_mutex_lock(&(philo->sh_info->mutex_c));

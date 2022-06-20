@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   philosopher.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: hoh <marvin@42.fr>                         +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/06/20 11:35:53 by hoh               #+#    #+#             */
+/*   Updated: 2022/06/20 11:35:54 by hoh              ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "philosopher.h"
 
 int	parent_process(t_philo *philo)
@@ -11,19 +23,18 @@ int	parent_process(t_philo *philo)
 	while (i < philo->sh_info->philo_num)
 		kill(philo->sh_info->pids[i ++], SIGUSR1);
 	free_all(philo);
-	/*printf("%d\n", getpid());
-	while (1);*/
-	return (1);
+	return (0);
 }
 
 int	child_process(int n, t_philo *philo)
 {
 	philo->th_num = n;
-	pthread_create(&(philo->thread_t), 0, monitoring, (void *)philo);
+	if (pthread_create(&(philo->thr), 0, monitoring, (void *)philo))
+		return (printf("thread create error!\n"));
 	routine(n, philo);
-	pthread_join(philo->thread_t, 0);
+	pthread_join(philo->thr, 0);
 	free_all(philo);
-	return (1);
+	return (0);
 }
 
 int	main(int argc, char *argv[])

@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   init.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: hoh <marvin@42.fr>                         +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/06/20 11:37:21 by hoh               #+#    #+#             */
+/*   Updated: 2022/06/20 11:37:22 by hoh              ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "philosopher.h"
 
 t_info	*info_init(int argc, char *argv[]);
@@ -85,5 +97,5 @@ void	free_all(t_philo *philo)
 	free(philo->sh_info->mutex_s);
 	free(philo->sh_info->mutex_m);
 	free(philo->sh_info);
-	free(philo); // 뮤텍스 디스트로이까지 여기다 넣어버리면 안될까?
+	free(philo);
 }

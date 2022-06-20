@@ -23,7 +23,7 @@ static void	start_simulation(int n, t_philo *philo)
 
 static void	simulation(int n, t_philo *philo)
 {
-	while (1)
+	while (philo->state != philo->sh_info->must_eat)
 	{
 		fork_sem_lock(n, philo);
 		eating(n, philo);
