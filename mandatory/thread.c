@@ -64,6 +64,7 @@ static void	simulation(int n, int number, t_philo *philo)
 			break ;
 		if (thinking(n, philo))
 			break ;
+		usleep(100);
 	}
 }
 
