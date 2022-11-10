@@ -10,12 +10,15 @@
     
 	  
 # Specifications  
-(과제 pdf)  
+[philosopher.pdf](./philosopher.pdf)  
+
+(mandatory)  
 실행 파일의 이름은 philo이다.  
 전역변수는 사용할 수 없다.  
 각 철학자는 thread여야 한다.  
 포크는 각각의 철학자 사이에 놓여있으며, 철학자의 숫자만큼 존재한다.  
 파일의 인자로, philosopher_num, time_to_eat, time_to_die, time_to_sleep을 받아야 한다. 각각 철학자의 숫자, 식사시간, 먹지 않으면 죽는 시간, 자는 시간이다. 여기에 추가로 must_eat 인자를 넣을 것인지 선택할 수 있다. 넣지 않으면 시뮬레이션은 철학자가 죽기 전까지 계속 돌아가며, 넣는다면 모든 철학자가 해당하는 횟수만큼 식사를 한 경우 종료된다.  
+
 (Bonus)  
 각 철학자는 process여야 한다.  
 포크는 테이블의 가운데 철학자 숫자만큼 쌓여있다. 즉 madatory에서는 자기 양옆의 포크만 집을 수 있었지만, bonus에서는 아무 포크나 집을 수 있다.
