@@ -31,7 +31,7 @@ make 실행
 make bonus 실행  
 ./philo philosopher_num time_to_die time_to_eat time_to_sleep
 
-# What to learn?  
+# What to learn  
 프로세스와 스레드의 개념  
 프로세스와 스레드의 context switching  
 멀티 프로세싱과 멀티 스레딩 작업에서 data race와 deadlock문제  
